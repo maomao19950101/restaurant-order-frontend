@@ -212,7 +212,7 @@ onMounted(() => {
 /* Filter select */
 .filter-select {
   padding: 8px 14px;
-  background: var(--surface2);
+  background: var(--input-bg);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   color: var(--text);
@@ -221,7 +221,7 @@ onMounted(() => {
   cursor: pointer;
   min-width: 160px;
 }
-.filter-select:focus { border-color: var(--accent); }
+.filter-select:focus { border-color: var(--brand); }
 .filter-select option {
   background: var(--surface);
   color: var(--text);
@@ -239,31 +239,31 @@ onMounted(() => {
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
-  background: var(--surface2);
+  background: var(--surface-subtle);
   color: var(--text);
 }
-.btn:hover { border-color: var(--accent); }
+.btn:hover { border-color: var(--brand); }
 .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 .btn-primary {
-  background: var(--accent);
-  border-color: var(--accent);
+  background: var(--brand);
+  border-color: var(--brand);
   color: #fff;
 }
 .btn-primary:hover {
-  background: #2563eb;
-  border-color: #2563eb;
-  box-shadow: 0 4px 12px rgba(59,130,246,0.3);
+  background: var(--brand-hover);
+  border-color: var(--brand-hover);
+  box-shadow: 0 4px 12px rgba(99,102,241,0.3);
 }
 .btn-sm { padding: 6px 14px; font-size: 13px; }
 .btn-ghost { background: transparent; }
-.btn-ghost:hover { background: var(--surface2); }
+.btn-ghost:hover { background: var(--surface-hover); }
 .btn-danger {
   background: transparent;
-  border-color: var(--red);
-  color: var(--red);
+  border-color: var(--danger);
+  color: var(--danger);
 }
 .btn-danger:hover {
-  background: var(--red);
+  background: var(--danger);
   color: #fff;
 }
 
@@ -277,7 +277,7 @@ onMounted(() => {
 .data-table th {
   text-align: left;
   padding: 12px 16px;
-  background: var(--surface2);
+  background: var(--surface-subtle);
   color: var(--text2);
   font-weight: 500;
   font-size: 13px;
@@ -289,10 +289,10 @@ onMounted(() => {
   color: var(--text);
 }
 .data-table tbody tr:nth-child(even) {
-  background: rgba(39,53,72,0.3);
+  background: var(--surface-subtle);
 }
 .data-table tbody tr:hover {
-  background: var(--surface2);
+  background: var(--surface-hover);
 }
 .td-id { color: var(--text2); font-size: 13px; }
 .td-name { font-weight: 600; }
@@ -311,16 +311,16 @@ onMounted(() => {
   font-weight: 500;
 }
 .badge-green {
-  background: rgba(34,197,94,0.15);
-  color: var(--green);
+  background: var(--success-bg);
+  color: var(--success);
 }
 .badge-red {
-  background: rgba(239,68,68,0.15);
-  color: var(--red);
+  background: var(--danger-bg);
+  color: var(--danger);
 }
 .badge-blue {
-  background: rgba(59,130,246,0.15);
-  color: var(--accent);
+  background: var(--brand-subtle);
+  color: var(--brand);
 }
 
 /* Action group */
@@ -330,13 +330,16 @@ onMounted(() => {
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.6);
+  background: rgba(0,0,0,0.4);
   backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
   animation: fadeIn 0.2s ease;
+}
+[data-theme="dark"] .modal-overlay {
+  background: rgba(0,0,0,0.6);
 }
 @keyframes fadeIn {
   from { opacity: 0; }
@@ -347,8 +350,11 @@ onMounted(() => {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.15);
   animation: slideUp 0.3s ease;
+}
+[data-theme="dark"] .modal-card {
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
 }
 @keyframes slideUp {
   from { opacity: 0; transform: translateY(20px); }
@@ -377,7 +383,7 @@ onMounted(() => {
   transition: all 0.2s;
 }
 .modal-close:hover {
-  background: var(--surface2);
+  background: var(--surface-hover);
   color: var(--text);
 }
 .modal-body { padding: 24px; }
@@ -400,11 +406,11 @@ onMounted(() => {
   color: var(--text2);
   margin-bottom: 6px;
 }
-.required { color: var(--red); }
+.required { color: var(--danger); }
 .form-input {
   width: 100%;
   padding: 10px 14px;
-  background: var(--surface2);
+  background: var(--input-bg);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   color: var(--text);
@@ -413,10 +419,10 @@ onMounted(() => {
   transition: border-color 0.2s;
 }
 .form-input:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px rgba(99,102,241,0.12);
 }
-.form-input::placeholder { color: var(--text2); }
+.form-input::placeholder { color: var(--text-tertiary); }
 .form-input:disabled { opacity: 0.5; cursor: not-allowed; }
 select.form-input { cursor: pointer; }
 select.form-input option {
@@ -435,18 +441,18 @@ select.form-input option {
   padding: 8px 20px;
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
-  background: var(--surface2);
+  background: var(--surface-subtle);
   color: var(--text2);
   font-size: 13px;
   cursor: pointer;
   transition: all 0.2s;
 }
 .toggle-btn.active {
-  background: var(--accent);
-  border-color: var(--accent);
+  background: var(--brand);
+  border-color: var(--brand);
   color: #fff;
 }
 .toggle-btn:hover:not(.active) {
-  border-color: var(--accent);
+  border-color: var(--brand);
 }
 </style>

@@ -10,7 +10,7 @@
         <div class="header-placeholder"></div>
       </div>
       <div class="status-info" v-if="order">
-        <div class="status-icon">{{ statusIcon }}</div>
+        <div class="status-icon" v-html="statusSvg"></div>
         <div class="status-text">{{ statusText }}</div>
         <div class="status-desc">{{ statusDesc }}</div>
       </div>
@@ -40,7 +40,7 @@
       <!-- Order info -->
       <div class="section-card">
         <div class="section-title">
-          <span class="section-icon">📋</span>
+          <span class="section-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="3" width="14" height="18" rx="2"/><line x1="9" y1="9" x2="15" y2="9"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/></svg></span>
           订单信息
         </div>
         <div class="info-rows">
@@ -62,7 +62,7 @@
       <!-- Items -->
       <div class="section-card">
         <div class="section-title">
-          <span class="section-icon">🍽️</span>
+          <span class="section-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11h18l-1.5 7a2 2 0 0 1-2 1.5H6.5a2 2 0 0 1-2-1.5L3 11z"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
           菜品明细
         </div>
         <div class="items-list">
@@ -82,7 +82,7 @@
       <!-- Remark -->
       <div class="section-card" v-if="order.remark">
         <div class="section-title">
-          <span class="section-icon">📝</span>
+          <span class="section-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></span>
           备注
         </div>
         <div class="remark-text">{{ order.remark }}</div>
@@ -114,7 +114,7 @@ const order = ref(null)
 let ws = null
 
 const statusTexts = ['待接单', '已接单', '制作中', '已出餐', '已完成', '已取消']
-const statusIcons = ['⏳', '✅', '👨‍🍳', '🔔', '🎉', '❌']
+const statusIcons = ['pending', 'accepted', 'cooking', 'ready', 'done', 'cancelled']
 const statusDescs = ['请耐心等待商家接单', '商家已确认您的订单', '厨师正在精心制作中', '菜品已准备好，请取餐', '感谢您的光临', '订单已取消']
 
 const statusStep = computed(() => {
@@ -128,9 +128,22 @@ const statusText = computed(() => {
   return statusTexts[order.value.status] || '未知'
 })
 
+const statusIconSvgs = {
+  pending: '<svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>',
+  accepted: '<svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',
+  cooking: '<svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M6 13.87A4 4 0 0 1 7.41 6a5.11 5.11 0 0 1 1.05-1.54 5 5 0 0 1 7.08 0A5.11 5.11 0 0 1 16.59 6 4 4 0 0 1 18 13.87V21H6z"/><line x1="6" y1="17" x2="18" y2="17"/></svg>',
+  ready: '<svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>',
+  done: '<svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',
+  cancelled: '<svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>'
+}
+
 const statusIcon = computed(() => {
-  if (!order.value) return '⏳'
-  return statusIcons[order.value.status] || '⏳'
+  if (!order.value) return 'pending'
+  return statusIcons[order.value.status] || 'pending'
+})
+
+const statusSvg = computed(() => {
+  return statusIconSvgs[statusIcon.value] || statusIconSvgs.pending
 })
 
 const statusDesc = computed(() => {
@@ -213,82 +226,92 @@ onUnmounted(() => {
 
 /* Header */
 .detail-header {
-  background: linear-gradient(135deg, #ff6b35 0%, #ff8c5a 100%);
-  padding: 12px 16px 24px;
+  background: linear-gradient(135deg, #ff6347 0%, #ff8a65 100%);
+  padding: 12px 16px 28px;
   padding-top: calc(12px + env(safe-area-inset-top, 0));
   color: #fff;
 }
 
 .detail-header.status-4 {
-  background: linear-gradient(135deg, #22c55e 0%, #4ade80 100%);
+  background: linear-gradient(135deg, #16a34a 0%, #4ade80 100%);
 }
 
 .detail-header.status-5 {
-  background: linear-gradient(135deg, #999 0%, #bbb 100%);
+  background: linear-gradient(135deg, #9ca3af 0%, #d1d5db 100%);
 }
 
 .header-nav {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 16px;
+  margin-bottom: 18px;
 }
 
 .back-btn {
-  width: 36px;
-  height: 36px;
+  width: 38px;
+  height: 38px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.15);
+  transition: background 0.2s ease;
+  backdrop-filter: blur(4px);
+}
+
+.back-btn:active {
+  background: rgba(255, 255, 255, 0.28);
 }
 
 .header-title {
   font-size: 17px;
   font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
 .header-placeholder {
-  width: 36px;
+  width: 38px;
 }
 
 .status-info {
   text-align: center;
-  animation: fadeIn 0.3s ease;
+  animation: fadeIn 0.35s ease;
 }
 
 .status-icon {
-  font-size: 40px;
+  font-size: 42px;
   margin-bottom: 8px;
 }
 
 .status-text {
-  font-size: 20px;
+  font-size: 21px;
   font-weight: 700;
+  letter-spacing: -0.01em;
 }
 
 .status-desc {
   font-size: 13px;
   opacity: 0.85;
-  margin-top: 4px;
+  margin-top: 5px;
+  font-weight: 400;
 }
 
 /* Content */
 .detail-content {
   padding: 16px;
   padding-bottom: 30px;
-  margin-top: -8px;
+  margin-top: -10px;
 }
 
 /* Timeline card */
 .timeline-card {
   background: var(--surface);
   border-radius: var(--radius);
-  padding: 20px 16px;
+  padding: 22px 16px;
   margin-bottom: 12px;
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
 }
 
 .timeline {
@@ -300,9 +323,9 @@ onUnmounted(() => {
 .timeline::before {
   content: '';
   position: absolute;
-  top: 8px;
-  left: 8px;
-  right: 8px;
+  top: 9px;
+  left: 9px;
+  right: 9px;
   height: 2px;
   background: var(--border);
 }
@@ -317,15 +340,15 @@ onUnmounted(() => {
 }
 
 .timeline-dot {
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
-  background: var(--border);
+  background: var(--border-strong);
   display: flex;
   align-items: center;
   justify-content: center;
   margin-bottom: 8px;
-  transition: all 0.3s ease;
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .timeline-item.active .timeline-dot {
@@ -334,9 +357,9 @@ onUnmounted(() => {
 }
 
 .timeline-item.current .timeline-dot {
-  width: 22px;
-  height: 22px;
-  animation: pulse 1.5s infinite;
+  width: 24px;
+  height: 24px;
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
 .timeline-item.active .timeline-dot :deep(.van-icon) {
@@ -351,6 +374,7 @@ onUnmounted(() => {
   font-size: 11px;
   color: var(--text3);
   white-space: nowrap;
+  font-weight: 400;
 }
 
 .timeline-item.active .timeline-title {
@@ -362,6 +386,7 @@ onUnmounted(() => {
   font-size: 10px;
   color: var(--text3);
   margin-top: 2px;
+  font-variant-numeric: tabular-nums;
 }
 
 /* Section card */
@@ -370,7 +395,8 @@ onUnmounted(() => {
   border-radius: var(--radius);
   padding: 16px;
   margin-bottom: 12px;
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
 }
 
 .section-title {
@@ -381,6 +407,7 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   gap: 6px;
+  letter-spacing: -0.01em;
 }
 
 .section-icon {
@@ -397,7 +424,7 @@ onUnmounted(() => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 8px 0;
+  padding: 9px 0;
 }
 
 .info-label {
@@ -409,6 +436,7 @@ onUnmounted(() => {
   font-size: 14px;
   color: var(--text);
   font-weight: 500;
+  font-variant-numeric: tabular-nums;
 }
 
 /* Items list */
@@ -420,7 +448,7 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 0;
+  padding: 13px 0;
   border-bottom: 1px solid var(--border);
 }
 
@@ -437,12 +465,14 @@ onUnmounted(() => {
   font-size: 14px;
   font-weight: 500;
   color: var(--text);
+  line-height: 1.3;
 }
 
 .item-specs {
   font-size: 12px;
   color: var(--text3);
   margin-top: 3px;
+  line-height: 1.4;
 }
 
 .item-right {
@@ -455,6 +485,7 @@ onUnmounted(() => {
 .item-qty {
   color: var(--text3);
   font-size: 13px;
+  font-weight: 500;
 }
 
 /* Remark */
@@ -462,9 +493,10 @@ onUnmounted(() => {
   font-size: 14px;
   color: var(--text2);
   line-height: 1.6;
-  padding: 10px 12px;
+  padding: 12px 14px;
   background: var(--bg);
   border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
 }
 
 /* Total */
@@ -487,6 +519,7 @@ onUnmounted(() => {
 .total-row .total {
   font-size: 24px;
   font-weight: 700;
+  letter-spacing: -0.02em;
 }
 
 /* Loading */

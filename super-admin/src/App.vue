@@ -3,7 +3,7 @@
     <!-- Sidebar -->
     <aside class="sidebar">
       <div class="sidebar-logo">
-        <span class="logo-icon">🏢</span>
+        <span class="logo-icon">S</span>
         <span class="logo-text">餐饮管理平台</span>
       </div>
       <nav class="sidebar-nav">
@@ -37,6 +37,10 @@
       <header class="top-bar">
         <h1 class="page-title">{{ route.meta?.title }}</h1>
         <div class="top-bar-right">
+          <button class="theme-toggle" @click="toggleTheme" :title="theme === 'dark' ? '切换亮色' : '切换暗色'">
+            <svg v-if="theme === 'dark'" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+            <svg v-else width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          </button>
           <span class="current-time">{{ currentTime }}</span>
         </div>
       </header>
@@ -56,6 +60,19 @@ const route = useRoute()
 const router = useRouter()
 const nickname = ref(localStorage.getItem('super_nickname') || '超级管理员')
 const currentTime = ref('')
+const theme = ref(localStorage.getItem('super_theme') || 'light')
+
+const applyTheme = () => {
+  document.documentElement.setAttribute('data-theme', theme.value)
+}
+const toggleTheme = () => {
+  theme.value = theme.value === 'dark' ? 'light' : 'dark'
+  localStorage.setItem('super_theme', theme.value)
+  applyTheme()
+}
+
+// Apply theme on load
+applyTheme()
 
 const navItems = [
   {
@@ -101,35 +118,7 @@ const handleLogout = () => {
 </script>
 
 <style>
-/* === CSS Variables === */
-:root {
-  --bg: #0f172a;
-  --surface: #1e293b;
-  --surface2: #273548;
-  --border: #334155;
-  --text: #f1f5f9;
-  --text2: #94a3b8;
-  --accent: #3b82f6;
-  --green: #22c55e;
-  --yellow: #eab308;
-  --red: #ef4444;
-  --sidebar-w: 240px;
-  --topbar-h: 60px;
-  --radius: 12px;
-  --radius-sm: 8px;
-}
-
-/* === Reset & Base === */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html, body, #app { height: 100%; }
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  -webkit-font-smoothing: antialiased;
-}
-
-/* === Element Plus Dark Overrides === */
+/* === Element Plus Theme Overrides === */
 .el-card, .el-dialog {
   --el-card-bg-color: var(--surface) !important;
   --el-card-border-color: var(--border) !important;
@@ -145,22 +134,22 @@ body {
   --el-table-bg-color: var(--surface) !important;
   --el-table-tr-bg-color: var(--surface) !important;
   --el-table-header-bg-color: var(--surface2) !important;
-  --el-table-row-hover-bg-color: var(--surface2) !important;
+  --el-table-row-hover-bg-color: var(--surface-hover) !important;
   --el-table-border-color: var(--border) !important;
   --el-table-text-color: var(--text) !important;
   --el-table-header-text-color: var(--text2) !important;
 }
 .el-table .el-table__row--striped td.el-table__cell {
-  background: var(--surface2) !important;
+  background: var(--surface-subtle) !important;
 }
 .el-input__wrapper, .el-textarea__inner {
-  background: var(--surface2) !important;
+  background: var(--input-bg) !important;
   box-shadow: 0 0 0 1px var(--border) inset !important;
   color: var(--text) !important;
 }
 .el-input__inner { color: var(--text) !important; }
-.el-input__inner::placeholder { color: var(--text2) !important; }
-.el-select .el-input__wrapper { background: var(--surface2) !important; }
+.el-input__inner::placeholder { color: var(--text-tertiary) !important; }
+.el-select .el-input__wrapper { background: var(--input-bg) !important; }
 .el-dialog__title { color: var(--text) !important; }
 .el-dialog__headerbtn .el-dialog__close { color: var(--text2) !important; }
 .el-form-item__label { color: var(--text2) !important; }
@@ -170,8 +159,14 @@ body {
   --el-button-border-color: var(--border) !important;
   --el-button-text-color: var(--text) !important;
   --el-button-hover-bg-color: var(--border) !important;
-  --el-button-hover-border-color: var(--accent) !important;
+  --el-button-hover-border-color: var(--brand) !important;
   --el-button-hover-text-color: var(--text) !important;
+}
+.el-button--primary {
+  --el-button-bg-color: var(--brand) !important;
+  --el-button-border-color: var(--brand) !important;
+  --el-button-hover-bg-color: var(--brand-hover) !important;
+  --el-button-hover-border-color: var(--brand-hover) !important;
 }
 .el-switch__label { color: var(--text2) !important; }
 .el-message-box {
@@ -180,6 +175,16 @@ body {
   border: 1px solid var(--border) !important;
 }
 .el-overlay { backdrop-filter: blur(4px); }
+.el-select-dropdown {
+  background: var(--surface) !important;
+  border-color: var(--border) !important;
+}
+.el-select-dropdown__item {
+  color: var(--text) !important;
+}
+.el-select-dropdown__item.hover, .el-select-dropdown__item:hover {
+  background: var(--surface-hover) !important;
+}
 </style>
 
 <style scoped>
@@ -207,7 +212,12 @@ body {
   padding: 0 20px;
   border-bottom: 1px solid var(--border);
 }
-.logo-icon { font-size: 24px; }
+.logo-icon {
+  font-size: 28px;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: -1px;
+}
 .logo-text {
   font-size: 16px;
   font-weight: 700;
@@ -238,13 +248,13 @@ body {
   cursor: pointer;
 }
 .nav-item:hover {
-  background: var(--surface2);
+  background: var(--surface-hover);
   color: var(--text);
 }
 .nav-item.active {
-  background: var(--accent);
+  background: var(--brand);
   color: #fff;
-  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
 }
 .nav-item.active .nav-icon { opacity: 1; }
 .nav-icon {
@@ -272,7 +282,7 @@ body {
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: var(--accent);
+  background: var(--brand);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -304,8 +314,8 @@ body {
   transition: all 0.2s;
 }
 .logout-btn:hover {
-  background: rgba(239, 68, 68, 0.15);
-  color: var(--red);
+  background: var(--danger-bg);
+  color: var(--danger);
 }
 
 /* === Main Area === */
@@ -330,6 +340,28 @@ body {
   font-size: 18px;
   font-weight: 600;
   color: var(--text);
+}
+.top-bar-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.theme-toggle {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text2);
+  cursor: pointer;
+  padding: 8px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+.theme-toggle:hover {
+  background: var(--surface-hover);
+  color: var(--text);
+  border-color: var(--brand);
 }
 .current-time {
   font-size: 13px;

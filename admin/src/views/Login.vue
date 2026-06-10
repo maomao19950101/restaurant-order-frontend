@@ -7,8 +7,10 @@
     </div>
     <div class="login-card">
       <div class="login-header">
-        <div class="login-logo">🍜</div>
-        <h1>餐厅管理系统</h1>
+        <div class="login-logo">
+          <span class="logo-icon">R</span>
+        </div>
+        <h1>Restaurant</h1>
         <p>管理员登录</p>
       </div>
       <el-form
@@ -41,7 +43,7 @@
           <el-button
             type="primary"
             size="large"
-            style="width: 100%; height: 44px; font-size: 15px; font-weight: 600; border-radius: 8px"
+            class="login-btn"
             :loading="loading"
             @click="handleLogin"
           >
@@ -97,7 +99,7 @@ const handleLogin = async () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+  background: linear-gradient(135deg, #f0f1ff 0%, #e8e0ff 100%);
   position: relative;
   overflow: hidden;
 }
@@ -108,19 +110,22 @@ const handleLogin = async () => {
   filter: blur(80px);
   opacity: .4;
 }
+[data-theme="dark"] .login-page {
+  background: linear-gradient(135deg, var(--bg) 0%, #1a1530 50%, var(--bg) 100%);
+}
 .bg-circle.c1 {
   width: 400px; height: 400px;
-  background: var(--accent);
+  background: var(--brand);
   top: -100px; right: -100px;
 }
 .bg-circle.c2 {
   width: 300px; height: 300px;
-  background: #8b5cf6;
+  background: var(--brand-hover);
   bottom: -50px; left: -50px;
 }
 .bg-circle.c3 {
   width: 200px; height: 200px;
-  background: var(--green);
+  background: var(--success);
   top: 50%; left: 50%;
   transform: translate(-50%, -50%);
   opacity: .15;
@@ -131,7 +136,7 @@ const handleLogin = async () => {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 16px;
-  box-shadow: 0 25px 60px rgba(0, 0, 0, .5);
+  box-shadow: var(--shadow-lg);
   position: relative;
   z-index: 1;
 }
@@ -140,14 +145,30 @@ const handleLogin = async () => {
   margin-bottom: 36px;
 }
 .login-logo {
-  font-size: 48px;
-  margin-bottom: 12px;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+.logo-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--brand), var(--brand-hover));
+  color: #fff;
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -1px;
+  box-shadow: 0 6px 16px rgba(99,102,241,0.3);
 }
 .login-header h1 {
   font-size: 24px;
   font-weight: 700;
   color: var(--text);
   margin-bottom: 6px;
+  letter-spacing: -0.5px;
 }
 .login-header p {
   color: var(--text2);
@@ -157,6 +178,21 @@ const handleLogin = async () => {
   text-align: center;
   margin-top: 16px;
   font-size: 13px;
-  color: var(--text2);
+  color: var(--text-tertiary);
+}
+.login-btn {
+  width: 100% !important;
+  height: 44px !important;
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  border-radius: var(--radius-sm) !important;
+  background: linear-gradient(135deg, var(--brand), var(--brand-hover)) !important;
+  border: none !important;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3) !important;
+  transition: all .2s ease !important;
+}
+.login-btn:hover {
+  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4) !important;
+  transform: translateY(-1px);
 }
 </style>

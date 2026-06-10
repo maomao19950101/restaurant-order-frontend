@@ -8,7 +8,7 @@
     <div class="login-card">
       <div class="login-header">
         <div class="logo-ring">
-          <span class="logo">🏢</span>
+          <span class="logo">S</span>
         </div>
         <h1>餐饮管理平台</h1>
         <p>超级管理员登录</p>
@@ -76,7 +76,7 @@ const handleLogin = async () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--bg, #0f172a);
+  background: var(--bg);
   position: relative;
   overflow: hidden;
 }
@@ -91,11 +91,11 @@ const handleLogin = async () => {
   position: absolute;
   border-radius: 50%;
   filter: blur(80px);
-  opacity: 0.15;
+  opacity: 0.12;
 }
 .shape-1 {
   width: 500px; height: 500px;
-  background: #3b82f6;
+  background: #6366f1;
   top: -10%; left: -5%;
   animation: float 20s ease-in-out infinite;
 }
@@ -107,7 +107,7 @@ const handleLogin = async () => {
 }
 .shape-3 {
   width: 300px; height: 300px;
-  background: #06b6d4;
+  background: #a78bfa;
   top: 50%; left: 50%;
   transform: translate(-50%, -50%);
   animation: float 15s ease-in-out infinite;
@@ -122,13 +122,17 @@ const handleLogin = async () => {
 .login-card {
   width: 420px;
   padding: 48px 40px;
-  background: var(--surface, #1e293b);
+  background: var(--surface);
   border-radius: 20px;
-  border: 1px solid var(--border, #334155);
-  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--border);
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.12);
   position: relative;
   z-index: 1;
   animation: slideUp 0.5s ease-out;
+}
+
+[data-theme="dark"] .login-card {
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4);
 }
 
 @keyframes slideUp {
@@ -144,23 +148,29 @@ const handleLogin = async () => {
   width: 72px;
   height: 72px;
   margin: 0 auto 16px;
-  background: linear-gradient(135deg, var(--accent, #3b82f6), #8b5cf6);
+  background: linear-gradient(135deg, var(--brand), #8b5cf6);
   border-radius: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 8px 24px rgba(59, 130, 246, 0.3);
+  box-shadow: 0 8px 24px rgba(99, 102, 241, 0.3);
 }
-.logo { font-size: 36px; }
+.logo {
+  font-size: 32px;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: -1px;
+  font-family: var(--font);
+}
 .login-header h1 {
   font-size: 24px;
   font-weight: 700;
-  color: var(--text, #f1f5f9);
+  color: var(--text);
   margin-bottom: 6px;
 }
 .login-header p {
   font-size: 14px;
-  color: var(--text2, #94a3b8);
+  color: var(--text2);
 }
 
 .login-btn {
@@ -169,13 +179,13 @@ const handleLogin = async () => {
   font-size: 16px;
   font-weight: 600;
   border-radius: 12px;
-  background: linear-gradient(135deg, var(--accent, #3b82f6), #2563eb) !important;
+  background: linear-gradient(135deg, var(--brand), #4f46e5) !important;
   border: none !important;
-  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3);
+  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.3);
   transition: all 0.2s ease;
 }
 .login-btn:hover {
   transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
 }
 </style>

@@ -73,19 +73,26 @@ function confirmTable() {
   display: flex;
   flex-direction: column;
 }
+
 .table-header {
   text-align: center;
-  padding: 40px 16px 24px;
+  padding: 48px 16px 28px;
 }
+
 .table-title {
-  font-size: 22px;
+  font-size: 24px;
   font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text);
 }
+
 .table-sub {
   font-size: 14px;
-  color: var(--text-secondary);
+  color: var(--text3);
   margin-top: 8px;
+  font-weight: 400;
 }
+
 .table-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -93,34 +100,64 @@ function confirmTable() {
   padding: 0 16px;
   flex: 1;
 }
+
 .table-item {
-  background: #fff;
-  border-radius: 12px;
-  padding: 16px 0;
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 18px 0;
   text-align: center;
   cursor: pointer;
-  border: 2px solid transparent;
-  transition: all 0.2s;
+  border: 2px solid var(--border);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: var(--shadow-sm);
 }
+
+.table-item:active {
+  transform: scale(0.96);
+}
+
 .table-item.active {
   border-color: var(--primary);
   background: var(--primary-light);
+  box-shadow: 0 2px 12px rgba(255, 107, 53, 0.12);
 }
+
 .table-num {
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 700;
+  color: var(--text2);
+  font-variant-numeric: tabular-nums;
+  transition: color 0.25s ease;
+}
+
+.table-item.active .table-num {
   color: var(--primary);
 }
+
 .table-label {
   font-size: 12px;
-  color: var(--text-secondary);
+  color: var(--text3);
   margin-top: 4px;
+  font-weight: 400;
 }
+
 .table-footer {
   padding: 16px;
+  padding-bottom: calc(16px + env(safe-area-inset-bottom, 0));
 }
+
 .confirm-btn {
   background: var(--primary) !important;
   border: none !important;
+  height: 48px;
+  font-size: 16px;
+  font-weight: 600;
+  box-shadow: 0 4px 14px rgba(255, 107, 53, 0.3);
+  border-radius: 24px !important;
+  letter-spacing: -0.01em;
+}
+
+.confirm-btn:disabled {
+  opacity: 0.5;
 }
 </style>

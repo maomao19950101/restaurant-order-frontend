@@ -83,36 +83,39 @@ onUnmounted(() => {
   position: sticky;
   top: 0;
   z-index: 200;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding: 6px 16px;
+  background: linear-gradient(135deg, #5b6ef5 0%, #7c5cbf 100%);
+  padding: 8px 16px;
   color: #fff;
+  backdrop-filter: blur(8px);
 }
 .collab-indicator {
   display: flex;
   align-items: center;
   gap: 8px;
   font-size: 12px;
+  letter-spacing: 0.01em;
 }
 .pulse-dot {
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
   background: #4ade80;
   border-radius: 50%;
-  animation: pulse 2s infinite;
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  box-shadow: 0 0 0 2px rgba(74, 222, 128, 0.2);
 }
 @keyframes pulse {
   0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.5; transform: scale(1.3); }
+  50% { opacity: 0.6; transform: scale(1.2); }
 }
-.collab-text { opacity: 0.95; }
-.page-slide-enter-active { animation: slideIn 0.25s ease-out; }
-.page-slide-leave-active { animation: slideOut 0.2s ease-in; }
+.collab-text { opacity: 0.92; font-weight: 500; }
+.page-slide-enter-active { animation: slideIn 0.28s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
+.page-slide-leave-active { animation: slideOut 0.22s cubic-bezier(0.55, 0.085, 0.68, 0.53); }
 @keyframes slideIn {
-  from { transform: translateX(30px); opacity: 0; }
+  from { transform: translateX(24px); opacity: 0; }
   to { transform: translateX(0); opacity: 1; }
 }
 @keyframes slideOut {
   from { transform: translateX(0); opacity: 1; }
-  to { transform: translateX(-30px); opacity: 0; }
+  to { transform: translateX(-24px); opacity: 0; }
 }
 </style>

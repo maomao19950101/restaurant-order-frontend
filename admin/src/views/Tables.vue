@@ -8,8 +8,10 @@
     <el-row :gutter="16">
       <el-col :span="4" v-for="table in tables" :key="table.id">
         <el-card shadow="hover" style="margin-bottom: 16px; text-align: center; cursor: pointer" @click="openDialog(table)">
-          <div style="font-size: 36px; margin-bottom: 8px">
-            {{ table.status === 0 ? '🪑' : table.status === 1 ? '🍽️' : '🧹' }}
+          <div style="margin-bottom: 8px">
+            <span v-if="table.status === 0" class="status-dot available"></span>
+            <span v-else-if="table.status === 1" class="status-dot occupied"></span>
+            <span v-else class="status-dot cleaning"></span>
           </div>
           <div style="font-size: 18px; font-weight: 600">{{ table.tableNo }}</div>
           <div style="font-size: 12px; color: #909399">{{ table.seats }}人桌</div>
@@ -98,3 +100,132 @@ const handleDelete = async (table) => {
 
 onMounted(loadTables)
 </script>
+
+<style scoped>
+/* Table cards */
+.table-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 16px;
+}
+.table-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px 16px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color .2s, box-shadow .2s;
+}
+.table-card:hover {
+  border-color: var(--brand);
+  box-shadow: var(--shadow-sm);
+}
+.table-card-icon {
+  font-size: 36px;
+  margin-bottom: 8px;
+}
+.table-card-number {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text);
+}
+.table-card-seats {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  margin-top: 2px;
+}
+.table-card-status {
+  margin-top: 10px;
+}
+.table-card-actions {
+  margin-top: 10px;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+/* Status dots */
+.status-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+.status-dot.available { background-color: #22c55e; }
+.status-dot.occupied { background-color: #f97316; }
+.status-dot.cleaning { background-color: #eab308; }
+
+/* Status badge overrides for el-tag */
+:deep(.el-tag) {
+  border: none !important;
+  border-radius: 999px !important;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* Dialog form styling */
+:deep(.el-dialog) {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+:deep(.el-dialog__header) {
+  border-bottom: 1px solid var(--border);
+  padding: 16px 20px;
+}
+:deep(.el-dialog__body) {
+  padding: 20px;
+}
+:deep(.el-dialog__footer) {
+  padding: 12px 20px;
+  border-top: 1px solid var(--border);
+}
+
+/* Form dialog footer buttons */
+:deep(.el-button--primary) {
+  --el-button-bg-color: var(--brand) !important;
+  --el-button-border-color: var(--brand) !important;
+  --el-button-hover-bg-color: var(--brand-hover) !important;
+  --el-button-hover-border-color: var(--brand-hover) !important;
+}
+
+/* Card grid spacing */
+:deep(.el-row) {
+  margin-bottom: 0;
+}
+:deep(.el-col) {
+  margin-bottom: 16px;
+}
+
+/* el-card overrides for table cards */
+:deep(.el-card) {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: none;
+  transition: border-color .2s, box-shadow .2s;
+}
+:deep(.el-card:hover) {
+  border-color: var(--brand);
+  box-shadow: var(--shadow-sm);
+}
+:deep(.el-card .el-card__body) {
+  padding: 24px 16px;
+}
+
+/* Form inputs in dialog */
+:deep(.el-form-item__label) {
+  color: var(--text2);
+  font-weight: 500;
+}
+:deep(.el-input__wrapper),
+:deep(.el-textarea__inner) {
+  background-color: var(--input-bg);
+  box-shadow: 0 0 0 1px var(--border-strong) inset;
+  border-radius: var(--radius-sm);
+}
+:deep(.el-input__wrapper:focus-within),
+:deep(.el-textarea__inner:focus) {
+  box-shadow: 0 0 0 2px var(--brand) inset;
+}
+</style>

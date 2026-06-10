@@ -105,7 +105,7 @@ const loadOrders = async () => {
 
 const handleNewOrder = () => {
   loadStats(); loadOrders()
-  ElNotification({ title: '📊 数据刷新', message: '有新订单，数据已自动更新', type: 'info', duration: 2000 })
+  ElNotification({ title: '数据刷新', message: '有新订单，数据已自动更新', type: 'info', duration: 2000 })
 }
 
 onMounted(() => { loadStats(); loadOrders(); window.addEventListener('new-order', handleNewOrder) })
@@ -119,8 +119,8 @@ onUnmounted(() => { window.removeEventListener('new-order', handleNewOrder) })
   border-radius: 12px;
   font-weight: 500;
 }
-.ws-dot.online { background: rgba(34,197,94,.15); color: var(--green); }
-.ws-dot.offline { background: rgba(148,163,184,.15); color: var(--text2); }
+.ws-dot.online { background: var(--success-bg); color: var(--success); }
+.ws-dot.offline { background: var(--surface-subtle); color: var(--text-tertiary); }
 .refresh-btn {
   background: var(--surface2);
   border: 1px solid var(--border);
@@ -131,7 +131,7 @@ onUnmounted(() => { window.removeEventListener('new-order', handleNewOrder) })
   display: flex; align-items: center; justify-content: center;
   transition: all .2s;
 }
-.refresh-btn:hover { border-color: var(--accent); color: var(--accent); }
+.refresh-btn:hover { border-color: var(--brand); color: var(--brand); }
 
 /* Stat Grid */
 .stat-grid {
@@ -150,7 +150,7 @@ onUnmounted(() => { window.removeEventListener('new-order', handleNewOrder) })
   gap: 16px;
   transition: border-color .2s;
 }
-.stat-item:hover { border-color: var(--accent); }
+.stat-item:hover { border-color: var(--brand); }
 .stat-icon {
   width: 48px; height: 48px;
   border-radius: 12px;
@@ -177,7 +177,7 @@ onUnmounted(() => { window.removeEventListener('new-order', handleNewOrder) })
 .card-title { font-size: 15px; font-weight: 600; color: var(--text); }
 .link-btn {
   background: none; border: none;
-  color: var(--accent); font-size: 13px;
+  color: var(--brand); font-size: 13px;
   cursor: pointer; font-weight: 500;
 }
 .link-btn:hover { text-decoration: underline; }
@@ -190,12 +190,12 @@ onUnmounted(() => { window.removeEventListener('new-order', handleNewOrder) })
   font-size: 12px;
   font-weight: 500;
 }
-.status-badge.pending { background: rgba(234,179,8,.15); color: var(--yellow); }
-.status-badge.accepted { background: rgba(59,130,246,.15); color: var(--accent); }
-.status-badge.cooking { background: rgba(249,115,22,.15); color: #f97316; }
-.status-badge.ready { background: rgba(34,197,94,.15); color: var(--green); }
-.status-badge.done { background: rgba(148,163,184,.15); color: var(--text2); }
-.status-badge.cancelled { background: rgba(239,68,68,.15); color: var(--red); }
+.status-badge.pending { background: var(--warning-bg); color: var(--warning); }
+.status-badge.accepted { background: var(--info-bg); color: var(--info); }
+.status-badge.cooking { background: rgba(249,115,22,.08); color: #f97316; }
+.status-badge.ready { background: var(--success-bg); color: var(--success); }
+.status-badge.done { background: var(--surface-subtle); color: var(--text2); }
+.status-badge.cancelled { background: var(--danger-bg); color: var(--danger); }
 
 @media (max-width: 1200px) {
   .stat-grid { grid-template-columns: repeat(2, 1fr); }

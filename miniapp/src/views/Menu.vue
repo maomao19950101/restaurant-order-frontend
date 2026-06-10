@@ -4,7 +4,15 @@
     <div class="menu-header">
       <div class="header-content">
         <div class="header-left">
-          <div class="restaurant-icon">🍜</div>
+          <div class="restaurant-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 11h18l-1.5 7a2 2 0 0 1-2 1.5H6.5a2 2 0 0 1-2-1.5L3 11z"/>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+              <line x1="8" y1="3" x2="8" y2="5"/>
+              <line x1="12" y1="2" x2="12" y2="5"/>
+              <line x1="16" y1="3" x2="16" y2="5"/>
+            </svg>
+          </div>
           <div class="header-info">
             <div class="restaurant-name">{{ restaurantName }}</div>
             <div class="table-badge" v-if="cart.tableId">
@@ -38,7 +46,7 @@
           :class="{ active: activeCategory === index }"
           @click="scrollToCategory(index)"
         >
-          <span class="category-icon">{{ cat.icon || '📋' }}</span>
+          <span class="category-icon">{{ cat.icon || '' }}</span>
           <span class="category-name">{{ cat.name }}</span>
           <span class="category-count">{{ cat.dishes?.length || 0 }}</span>
         </div>
@@ -53,7 +61,7 @@
           class="dish-group"
         >
           <div class="dish-group-title">
-            <span class="group-icon">{{ cat.icon || '🍽️' }}</span>
+            <span class="group-icon">{{ cat.icon || '' }}</span>
             {{ cat.name }}
           </div>
           <div
@@ -99,7 +107,39 @@
 
         <!-- Empty state -->
         <div v-if="filteredCategories.length === 0" class="empty-dishes">
-          <van-empty description="没有找到相关菜品" image="search" />
+          <div class="empty-illustration">
+            <!-- Search no result -->
+            <svg v-if="searchText.trim()" width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="60" cy="52" r="40" fill="#FFF3EE" stroke="#FFD4C0" stroke-width="1.5"/>
+              <circle cx="52" cy="48" r="20" stroke="#FFAB91" stroke-width="2.5" fill="none"/>
+              <line x1="66" y1="62" x2="80" y2="76" stroke="#FFAB91" stroke-width="2.5" stroke-linecap="round"/>
+              <path d="M44 44 L60 44" stroke="#FFD4C0" stroke-width="2" stroke-linecap="round"/>
+              <path d="M48 50 L56 50" stroke="#FFD4C0" stroke-width="2" stroke-linecap="round"/>
+              <circle cx="90" cy="30" r="3" fill="#FFE0CC"/>
+              <circle cx="25" cy="70" r="2" fill="#FFE0CC"/>
+              <circle cx="95" cy="65" r="2" fill="#FFE0CC"/>
+            </svg>
+            <!-- No menu data -->
+            <svg v-else width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="60" cy="52" r="40" fill="#FFF3EE" stroke="#FFD4C0" stroke-width="1.5"/>
+              <ellipse cx="60" cy="50" rx="24" ry="8" stroke="#FFAB91" stroke-width="2" fill="none"/>
+              <path d="M36 50 C36 50 36 68 60 68 C84 68 84 50 84 50" stroke="#FFAB91" stroke-width="2" fill="none"/>
+              <path d="M52 38 C52 38 54 28 60 28 C66 28 68 38 68 38" stroke="#FFAB91" stroke-width="2" fill="none" stroke-linecap="round"/>
+              <line x1="48" y1="56" x2="72" y2="56" stroke="#FFD4C0" stroke-width="1.5" stroke-linecap="round"/>
+              <line x1="52" y1="61" x2="68" y2="61" stroke="#FFD4C0" stroke-width="1.5" stroke-linecap="round"/>
+              <circle cx="28" cy="38" r="3" fill="#FFE0CC"/>
+              <circle cx="92" cy="42" r="2.5" fill="#FFE0CC"/>
+              <circle cx="88" cy="72" r="2" fill="#FFE0CC"/>
+              <path d="M20 58 L26 58" stroke="#FFE0CC" stroke-width="2" stroke-linecap="round"/>
+              <path d="M94 55 L100 55" stroke="#FFE0CC" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <p class="empty-title">{{ searchText.trim() ? '没有找到相关菜品' : '暂无菜品数据' }}</p>
+          <p class="empty-hint">{{ searchText.trim() ? '试试换个关键词搜索吧' : '商家正在准备菜单，请稍后再来' }}</p>
+          <div v-if="searchText.trim()" class="empty-action" @click="searchText = ''">
+            <van-icon name="replay" size="14" />
+            <span>清除搜索</span>
+          </div>
         </div>
       </div>
     </div>
@@ -358,8 +398,8 @@ onUnmounted(() => {
   position: sticky;
   top: 0;
   z-index: 100;
-  background: linear-gradient(135deg, #ff6b35 0%, #ff8c5a 100%);
-  padding: 12px 16px;
+  background: linear-gradient(135deg, #ff6347 0%, #ff8a65 100%);
+  padding: 14px 16px;
   color: #fff;
 }
 
@@ -376,54 +416,63 @@ onUnmounted(() => {
 }
 
 .restaurant-icon {
-  width: 40px;
-  height: 40px;
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 10px;
+  width: 42px;
+  height: 42px;
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 22px;
+  backdrop-filter: blur(4px);
 }
 
 .header-info {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 3px;
 }
 
 .restaurant-name {
   font-size: 18px;
   font-weight: 700;
-  letter-spacing: 0.5px;
+  letter-spacing: -0.01em;
 }
 
 .table-badge {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  background: rgba(255, 255, 255, 0.2);
-  padding: 2px 10px;
+  background: rgba(255, 255, 255, 0.18);
+  padding: 3px 10px;
   border-radius: 12px;
   font-size: 12px;
   width: fit-content;
+  font-weight: 500;
+  backdrop-filter: blur(4px);
 }
 
 .header-right {
-  width: 36px;
-  height: 36px;
-  background: rgba(255, 255, 255, 0.2);
+  width: 38px;
+  height: 38px;
+  background: rgba(255, 255, 255, 0.18);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  transition: background 0.2s ease;
+  backdrop-filter: blur(4px);
+}
+
+.header-right:active {
+  background: rgba(255, 255, 255, 0.3);
 }
 
 /* Search bar */
 .search-bar {
   padding: 10px 16px;
   background: #fff;
+  border-bottom: 1px solid var(--border);
 }
 
 .search-input {
@@ -431,8 +480,15 @@ onUnmounted(() => {
   align-items: center;
   gap: 8px;
   background: var(--bg);
-  border-radius: 20px;
-  padding: 8px 14px;
+  border-radius: 22px;
+  padding: 9px 14px;
+  border: 1px solid var(--border);
+  transition: border-color 0.2s ease;
+}
+
+.search-input:focus-within {
+  border-color: var(--primary);
+  background: #fff;
 }
 
 .search-input input {
@@ -452,17 +508,18 @@ onUnmounted(() => {
 .menu-body {
   display: flex;
   flex: 1;
-  height: calc(100vh - 160px);
+  height: calc(100vh - 164px);
   overflow: hidden;
 }
 
 /* Category sidebar */
 .category-sidebar {
-  width: 85px;
+  width: 88px;
   flex-shrink: 0;
-  background: #fafafa;
+  background: #fafbfc;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+  border-right: 1px solid var(--border);
 }
 
 .category-sidebar::-webkit-scrollbar {
@@ -470,17 +527,21 @@ onUnmounted(() => {
 }
 
 .category-item {
-  padding: 14px 8px 14px 12px;
+  padding: 14px 8px 14px 10px;
   font-size: 13px;
   color: var(--text2);
   cursor: pointer;
   border-left: 3px solid transparent;
-  transition: all 0.2s ease;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 2px;
+  gap: 3px;
   position: relative;
+}
+
+.category-item:active {
+  background: rgba(255, 107, 53, 0.04);
 }
 
 .category-item.active {
@@ -497,13 +558,14 @@ onUnmounted(() => {
   top: 50%;
   transform: translateY(-50%);
   width: 3px;
-  height: 20px;
+  height: 22px;
   background: var(--primary);
   border-radius: 2px 0 0 2px;
 }
 
 .category-icon {
   font-size: 18px;
+  line-height: 1;
 }
 
 .category-name {
@@ -514,9 +576,11 @@ onUnmounted(() => {
 .category-count {
   font-size: 10px;
   color: var(--text3);
-  background: #f0f0f0;
-  padding: 1px 6px;
-  border-radius: 8px;
+  background: #f0f1f3;
+  padding: 1px 7px;
+  border-radius: 10px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
 }
 
 .category-item.active .category-count {
@@ -532,8 +596,12 @@ onUnmounted(() => {
   padding: 0 12px 120px;
 }
 
+.dish-list::-webkit-scrollbar {
+  display: none;
+}
+
 .dish-group-title {
-  padding: 14px 4px 10px;
+  padding: 16px 4px 10px;
   font-size: 16px;
   font-weight: 700;
   color: var(--text);
@@ -544,6 +612,7 @@ onUnmounted(() => {
   top: 0;
   background: var(--bg);
   z-index: 1;
+  letter-spacing: -0.01em;
 }
 
 .group-icon {
@@ -557,9 +626,10 @@ onUnmounted(() => {
   border-radius: var(--radius);
   padding: 12px;
   margin-bottom: 10px;
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
   animation: fadeIn 0.3s ease;
-  transition: transform 0.15s ease;
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .dish-card:active {
@@ -567,8 +637,8 @@ onUnmounted(() => {
 }
 
 .dish-image {
-  width: 90px;
-  height: 90px;
+  width: 92px;
+  height: 92px;
   border-radius: var(--radius-sm);
   overflow: hidden;
   flex-shrink: 0;
@@ -584,18 +654,18 @@ onUnmounted(() => {
 .dish-placeholder {
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+  background: linear-gradient(145deg, #ffe0cc 0%, #ffb899 100%);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 30px;
+  font-size: 28px;
   font-weight: 700;
   color: #fff;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
 .dish-placeholder.large {
-  font-size: 38px;
+  font-size: 36px;
 }
 
 .dish-tag {
@@ -605,9 +675,10 @@ onUnmounted(() => {
   background: var(--red);
   color: #fff;
   font-size: 10px;
-  padding: 1px 6px;
-  border-radius: 4px;
-  font-weight: 500;
+  padding: 2px 7px;
+  border-radius: var(--radius-xs);
+  font-weight: 600;
+  letter-spacing: 0.02em;
 }
 
 .dish-info {
@@ -623,6 +694,7 @@ onUnmounted(() => {
   font-weight: 600;
   color: var(--text);
   line-height: 1.3;
+  letter-spacing: -0.01em;
 }
 
 .dish-desc {
@@ -633,6 +705,7 @@ onUnmounted(() => {
   text-overflow: ellipsis;
   white-space: nowrap;
   max-width: 100%;
+  line-height: 1.4;
 }
 
 .dish-meta {
@@ -641,7 +714,7 @@ onUnmounted(() => {
   gap: 10px;
   font-size: 11px;
   color: var(--text3);
-  margin-top: 4px;
+  margin-top: 5px;
 }
 
 .dish-meta .van-icon {
@@ -668,30 +741,31 @@ onUnmounted(() => {
 }
 
 .action-btn {
-  width: 28px;
-  height: 28px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   user-select: none;
-  transition: all 0.15s ease;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .action-btn:active {
-  transform: scale(0.9);
+  transform: scale(0.88);
 }
 
 .action-btn.minus {
-  background: #f0f0f0;
+  background: var(--bg);
   color: var(--text2);
+  border: 1px solid var(--border-strong);
 }
 
 .action-btn.plus {
   background: var(--primary);
   color: #fff;
-  box-shadow: 0 2px 8px rgba(255, 107, 53, 0.3);
+  box-shadow: 0 2px 8px rgba(255, 107, 53, 0.28);
 }
 
 .quantity {
@@ -700,11 +774,62 @@ onUnmounted(() => {
   min-width: 20px;
   text-align: center;
   color: var(--text);
-  animation: bounceIn 0.2s ease;
+  animation: bounceIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  font-variant-numeric: tabular-nums;
 }
 
 .empty-dishes {
-  padding: 40px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 24px 40px;
+}
+
+.empty-illustration {
+  margin-bottom: 20px;
+  animation: emptyFloat 3s ease-in-out infinite;
+}
+
+@keyframes emptyFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+.empty-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 6px;
+  text-align: center;
+}
+
+.empty-hint {
+  font-size: 13px;
+  color: var(--text3);
+  text-align: center;
+  line-height: 1.5;
+}
+
+.empty-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 18px;
+  padding: 8px 20px;
+  background: #fff;
+  border: 1.5px solid var(--border-strong);
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text2);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.empty-action:active {
+  transform: scale(0.95);
+  background: var(--bg);
 }
 
 /* Spec popup */
@@ -744,22 +869,23 @@ onUnmounted(() => {
   font-size: 18px;
   font-weight: 700;
   color: var(--text);
+  letter-spacing: -0.01em;
 }
 
 .spec-desc {
   font-size: 13px;
   color: var(--text3);
   margin-top: 4px;
-  line-height: 1.4;
+  line-height: 1.5;
 }
 
 .spec-price {
   font-size: 20px;
-  margin-top: 8px;
+  margin-top: 10px;
 }
 
 .spec-section {
-  margin-bottom: 16px;
+  margin-bottom: 18px;
 }
 
 .spec-group-name {
@@ -777,13 +903,14 @@ onUnmounted(() => {
 
 .spec-option {
   padding: 8px 16px;
-  border-radius: 20px;
+  border-radius: 22px;
   background: var(--bg);
   font-size: 13px;
   cursor: pointer;
-  border: 1.5px solid transparent;
-  transition: all 0.2s ease;
+  border: 1.5px solid var(--border);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   color: var(--text2);
+  font-weight: 500;
 }
 
 .spec-option:active {
@@ -800,7 +927,8 @@ onUnmounted(() => {
 .spec-price-extra {
   font-size: 11px;
   color: var(--primary);
-  margin-left: 2px;
+  margin-left: 3px;
+  font-weight: 600;
 }
 
 .spec-remark {
@@ -809,12 +937,12 @@ onUnmounted(() => {
 
 .spec-remark input {
   width: 100%;
-  border: 1.5px solid var(--border);
+  border: 1.5px solid var(--border-strong);
   border-radius: var(--radius-sm);
   padding: 10px 14px;
   font-size: 14px;
   outline: none;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s ease, background 0.2s ease;
   background: var(--bg);
 }
 
@@ -838,8 +966,8 @@ onUnmounted(() => {
 }
 
 .qty-btn {
-  width: 32px;
-  height: 32px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -847,11 +975,12 @@ onUnmounted(() => {
   background: var(--bg);
   color: var(--text2);
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid var(--border);
 }
 
 .qty-btn:active {
-  transform: scale(0.9);
+  transform: scale(0.88);
 }
 
 .qty-num {
@@ -859,25 +988,24 @@ onUnmounted(() => {
   font-weight: 700;
   min-width: 24px;
   text-align: center;
+  font-variant-numeric: tabular-nums;
 }
 
 .add-btn {
   background: var(--primary) !important;
   border: none !important;
   padding: 0 28px;
-  height: 42px;
+  height: 44px;
   font-size: 15px;
   font-weight: 600;
-  box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+  box-shadow: 0 4px 14px rgba(255, 107, 53, 0.3);
+  border-radius: 22px !important;
 }
 
 /* Tabbar */
 .menu-tabbar {
   border-top: 1px solid var(--border);
+  box-shadow: 0 -1px 8px rgba(0, 0, 0, 0.02);
 }
 
-/* Empty state */
-.empty-dishes :deep(.van-empty) {
-  padding-top: 60px;
-}
 </style>

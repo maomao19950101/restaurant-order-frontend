@@ -38,7 +38,9 @@
       <div class="cart-detail safe-bottom">
         <div class="cart-items">
           <div v-if="cart.items.length === 0" class="empty-tip">
-            <div class="empty-icon">🛒</div>
+            <div class="empty-icon">
+              <svg width="36" height="36" viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="14" cy="30" r="2"/><circle cx="26" cy="30" r="2"/><path d="M4 4h4l4 20h18l3-14H10"/></svg>
+            </div>
             <div class="empty-text">购物车空空如也</div>
             <div class="empty-sub">快去选些好吃的吧~</div>
           </div>
@@ -125,11 +127,11 @@ function goCheckout() {
 <style scoped>
 .cart-wrapper {
   position: fixed;
-  bottom: 50px;
+  bottom: 52px;
   left: 0;
   right: 0;
   z-index: 200;
-  padding: 0 12px;
+  padding: 0 14px;
 }
 
 /* Cart bar */
@@ -137,11 +139,11 @@ function goCheckout() {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: var(--text);
-  border-radius: 24px;
+  background: #1e2028;
+  border-radius: 26px;
   padding: 8px 8px 8px 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-  animation: slideUp 0.3s ease;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.06);
+  animation: slideUp 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .cart-left {
@@ -156,21 +158,21 @@ function goCheckout() {
 }
 
 .cart-icon {
-  width: 44px;
-  height: 44px;
+  width: 46px;
+  height: 46px;
   border-radius: 50%;
-  background: #333;
+  background: #2d303a;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #666;
-  transition: all 0.3s ease;
+  color: #6b7280;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .cart-icon-wrap.has-items .cart-icon {
   background: var(--primary);
   color: #fff;
-  box-shadow: 0 4px 12px rgba(255, 107, 53, 0.4);
+  box-shadow: 0 4px 14px rgba(255, 107, 53, 0.35);
 }
 
 .cart-badge {
@@ -188,7 +190,8 @@ function goCheckout() {
   align-items: center;
   justify-content: center;
   padding: 0 5px;
-  animation: bounceIn 0.3s ease;
+  animation: bounceIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 1px 4px rgba(220, 38, 38, 0.3);
 }
 
 .cart-info {
@@ -200,47 +203,56 @@ function goCheckout() {
   color: #fff;
   font-size: 18px;
   font-weight: 700;
+  letter-spacing: -0.02em;
 }
 
 .cart-empty {
-  color: #666;
+  color: #6b7280;
   font-size: 13px;
+  font-weight: 400;
 }
 
 .checkout-btn {
-  background: #444 !important;
+  background: #3a3d47 !important;
   border: none !important;
-  color: #888 !important;
+  color: #9ca3af !important;
   padding: 0 20px;
-  height: 36px;
+  height: 38px;
   font-size: 14px;
   font-weight: 600;
+  border-radius: 19px !important;
 }
 
 .checkout-btn:not(:disabled) {
   background: var(--primary) !important;
   color: #fff !important;
-  box-shadow: 0 2px 8px rgba(255, 107, 53, 0.3);
+  box-shadow: 0 2px 10px rgba(255, 107, 53, 0.3);
 }
 
 /* Cart detail */
 .cart-detail {
-  padding: 8px 16px 16px;
+  padding: 12px 16px 16px;
 }
 
 .cart-items {
   max-height: 50vh;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.cart-items::-webkit-scrollbar {
+  display: none;
 }
 
 .empty-tip {
   text-align: center;
-  padding: 40px 0 30px;
+  padding: 48px 0 36px;
 }
 
 .empty-icon {
-  font-size: 48px;
-  margin-bottom: 12px;
+  font-size: 44px;
+  margin-bottom: 14px;
+  opacity: 0.7;
 }
 
 .empty-text {
@@ -252,7 +264,7 @@ function goCheckout() {
 .empty-sub {
   font-size: 13px;
   color: var(--text3);
-  margin-top: 4px;
+  margin-top: 6px;
 }
 
 .cart-item {
@@ -261,7 +273,7 @@ function goCheckout() {
   justify-content: space-between;
   padding: 14px 0;
   border-bottom: 1px solid var(--border);
-  animation: fadeIn 0.2s ease;
+  animation: fadeIn 0.25s ease;
 }
 
 .cart-item:last-child {
@@ -277,12 +289,14 @@ function goCheckout() {
   font-size: 15px;
   font-weight: 600;
   color: var(--text);
+  line-height: 1.3;
 }
 
 .cart-item-specs {
   font-size: 12px;
   color: var(--text3);
   margin-top: 3px;
+  line-height: 1.4;
 }
 
 .cart-item-right {
@@ -294,7 +308,7 @@ function goCheckout() {
 
 .cart-item-right .price {
   font-size: 15px;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .cart-item-qty {
@@ -304,28 +318,30 @@ function goCheckout() {
 }
 
 .qty-btn {
-  width: 26px;
-  height: 26px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .qty-btn:active {
-  transform: scale(0.9);
+  transform: scale(0.88);
 }
 
 .qty-btn.minus {
   background: var(--bg);
   color: var(--text2);
+  border: 1px solid var(--border);
 }
 
 .qty-btn.plus {
   background: var(--primary);
   color: #fff;
+  box-shadow: 0 2px 6px rgba(255, 107, 53, 0.25);
 }
 
 .qty-num {
@@ -333,6 +349,7 @@ function goCheckout() {
   font-weight: 700;
   min-width: 20px;
   text-align: center;
+  font-variant-numeric: tabular-nums;
 }
 
 .cart-remark {
@@ -341,13 +358,13 @@ function goCheckout() {
 
 .cart-remark input {
   width: 100%;
-  border: 1.5px solid var(--border);
+  border: 1.5px solid var(--border-strong);
   border-radius: var(--radius-sm);
   padding: 10px 14px;
   font-size: 14px;
   outline: none;
   background: var(--bg);
-  transition: border-color 0.2s;
+  transition: border-color 0.2s ease, background 0.2s ease;
 }
 
 .cart-remark input:focus {
@@ -367,6 +384,7 @@ function goCheckout() {
   display: inline-flex;
   align-items: center;
   gap: 4px;
+  transition: color 0.2s ease;
 }
 
 .cart-clear span:active {
@@ -391,20 +409,23 @@ function goCheckout() {
 .total-label {
   font-size: 14px;
   color: var(--text2);
+  font-weight: 500;
 }
 
 .cart-total .total {
   font-size: 22px;
   font-weight: 700;
+  letter-spacing: -0.02em;
 }
 
 .submit-btn {
   background: var(--primary) !important;
   border: none !important;
   padding: 0 32px;
-  height: 42px;
+  height: 44px;
   font-size: 15px;
   font-weight: 600;
-  box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+  box-shadow: 0 4px 14px rgba(255, 107, 53, 0.3);
+  border-radius: 22px !important;
 }
 </style>

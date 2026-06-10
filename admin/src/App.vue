@@ -9,8 +9,8 @@
     <!-- Sidebar -->
     <aside class="sidebar">
       <div class="sidebar-logo">
-        <span class="logo-icon">🍜</span>
-        <span class="logo-text">餐厅管理系统</span>
+        <div class="logo-icon">R</div>
+        <span class="logo-text">Restaurant</span>
       </div>
       <nav class="sidebar-nav">
         <router-link
@@ -24,7 +24,13 @@
         </router-link>
       </nav>
       <div class="sidebar-footer">
-        <div class="sidebar-version">v1.0.0</div>
+        <div class="sidebar-user">
+          <div class="sidebar-avatar">{{ username.charAt(0).toUpperCase() }}</div>
+          <div class="sidebar-user-info">
+            <div class="sidebar-user-name">{{ username }}</div>
+            <div class="sidebar-user-role">管理员</div>
+          </div>
+        </div>
       </div>
     </aside>
 
@@ -34,15 +40,23 @@
       <header class="top-header">
         <h1 class="header-title">{{ route.meta.title }}</h1>
         <div class="header-right">
+          <button class="theme-switch" @click="toggleTheme" :title="currentTheme === 'light' ? '切换暗色' : '切换亮色'">
+            <svg v-if="currentTheme === 'light'" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            <svg v-else width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+          </button>
           <div class="bell-wrapper" @click="goOrders">
             <span class="bell-icon" v-html="icons.Bell"></span>
             <span v-if="newOrderCount > 0" class="bell-badge">{{ newOrderCount > 99 ? '99+' : newOrderCount }}</span>
           </div>
+          <div class="header-divider"></div>
           <div class="user-info">
             <div class="user-avatar">{{ username.charAt(0).toUpperCase() }}</div>
             <span class="user-name">{{ username }}</span>
           </div>
-          <button class="logout-btn" @click="handleLogout">退出</button>
+          <button class="logout-btn" @click="handleLogout">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
+            退出
+          </button>
         </div>
       </header>
       <!-- Page content -->
@@ -60,6 +74,19 @@ import { useRoute, useRouter } from 'vue-router'
 const route = useRoute()
 const router = useRouter()
 const newOrderCount = ref(0)
+const currentTheme = ref(localStorage.getItem('admin_theme') || 'light')
+
+// Apply theme
+const applyTheme = (theme) => {
+  document.documentElement.setAttribute('data-theme', theme)
+  currentTheme.value = theme
+  localStorage.setItem('admin_theme', theme)
+}
+const toggleTheme = () => {
+  applyTheme(currentTheme.value === 'light' ? 'dark' : 'light')
+}
+// Init theme
+applyTheme(currentTheme.value)
 
 const isLoginPage = computed(() => route.path === '/login')
 
@@ -172,41 +199,54 @@ watch(isLoginPage, (isLogin) => {
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
 }
-.logo-icon { font-size: 24px; }
-.logo-text {
-  font-size: 16px;
+.logo-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, var(--brand), #a78bfa);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
   font-weight: 700;
+  color: #fff;
+  flex-shrink: 0;
+}
+.logo-text {
+  font-size: 15px;
+  font-weight: 600;
   color: var(--text);
   white-space: nowrap;
+  letter-spacing: -0.2px;
 }
 .sidebar-nav {
   flex: 1;
   padding: 12px 10px;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
 }
 .nav-item {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 10px 14px;
+  gap: 10px;
+  padding: 9px 12px;
   border-radius: var(--radius-sm);
   color: var(--text2);
   text-decoration: none;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
-  transition: all .2s;
+  transition: all .15s ease;
 }
 .nav-item:hover {
-  background: var(--surface2);
+  background: var(--surface-hover);
   color: var(--text);
 }
 .nav-item.active {
-  background: rgba(59, 130, 246, .15);
-  color: var(--accent);
+  background: var(--brand-subtle);
+  color: var(--brand);
 }
-.nav-item.active .nav-icon { color: var(--accent); }
+.nav-item.active .nav-icon { color: var(--brand); }
 .nav-icon {
   width: 20px;
   height: 20px;
@@ -220,13 +260,39 @@ watch(isLoginPage, (isLogin) => {
   height: 18px;
 }
 .sidebar-footer {
-  padding: 16px 20px;
+  padding: 16px 16px;
   border-top: 1px solid var(--border);
 }
-.sidebar-version {
-  font-size: 12px;
-  color: var(--text2);
-  text-align: center;
+.sidebar-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.sidebar-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--brand);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.sidebar-user-info { min-width: 0; }
+.sidebar-user-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sidebar-user-role {
+  font-size: 11px;
+  color: var(--text-tertiary);
 }
 
 /* ============ Main Wrapper ============ */
@@ -251,77 +317,106 @@ watch(isLoginPage, (isLogin) => {
   flex-shrink: 0;
 }
 .header-title {
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 600;
   color: var(--text);
+  letter-spacing: -0.2px;
 }
 .header-right {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 12px;
+}
+.theme-switch {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text2);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all .15s;
+}
+.theme-switch:hover {
+  background: var(--surface-hover);
+  color: var(--text);
+  border-color: var(--border-strong);
 }
 .bell-wrapper {
   position: relative;
   cursor: pointer;
   padding: 6px;
   border-radius: var(--radius-sm);
-  transition: background .2s;
+  transition: background .15s;
 }
-.bell-wrapper:hover { background: var(--surface2); }
-.bell-icon { width: 20px; height: 20px; display: flex; color: var(--text2); }
-.bell-icon :deep(svg) { width: 20px; height: 20px; }
+.bell-wrapper:hover { background: var(--surface-hover); }
+.bell-icon { width: 18px; height: 18px; display: flex; color: var(--text2); }
+.bell-icon :deep(svg) { width: 18px; height: 18px; }
 .bell-badge {
   position: absolute;
   top: 0;
   right: 0;
-  min-width: 18px;
-  height: 18px;
-  padding: 0 5px;
-  background: var(--red);
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  background: var(--danger);
   color: #fff;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 600;
-  border-radius: 9px;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
   line-height: 1;
 }
+.header-divider {
+  width: 1px;
+  height: 20px;
+  background: var(--border);
+}
 .user-info {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 .user-avatar {
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--accent), #8b5cf6);
+  background: linear-gradient(135deg, var(--brand), #a78bfa);
   color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 600;
 }
 .user-name {
-  font-size: 14px;
+  font-size: 13px;
   color: var(--text);
   font-weight: 500;
 }
 .logout-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   background: none;
   border: 1px solid var(--border);
-  color: var(--text2);
-  padding: 5px 14px;
+  color: var(--text-tertiary);
+  padding: 5px 12px;
   border-radius: var(--radius-sm);
   cursor: pointer;
-  font-size: 13px;
-  transition: all .2s;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all .15s;
 }
 .logout-btn:hover {
-  border-color: var(--red);
-  color: var(--red);
+  border-color: var(--danger);
+  color: var(--danger);
+  background: var(--danger-bg);
 }
 
 /* ============ Page Content ============ */

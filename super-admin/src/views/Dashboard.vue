@@ -99,9 +99,13 @@ const statCards = computed(() => [
   position: relative;
 }
 .stat-card:hover {
-  border-color: var(--accent);
+  border-color: var(--brand);
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+  box-shadow: 0 8px 24px rgba(99, 102, 241, 0.1);
+}
+
+[data-theme="dark"] .stat-card:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
 }
 
 .stat-icon {
@@ -111,7 +115,7 @@ const statCards = computed(() => [
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--accent);
+  color: var(--brand);
   flex-shrink: 0;
 }
 
@@ -139,7 +143,8 @@ const statCards = computed(() => [
   font-weight: 500;
   padding: 2px 8px;
   border-radius: 6px;
-  background: rgba(34,197,94,0.1);
+  background: var(--success-bg);
+  color: var(--success);
 }
 
 .section-card {
@@ -166,7 +171,7 @@ const statCards = computed(() => [
   align-items: center;
   gap: 8px;
   padding: 12px 24px;
-  background: var(--surface2);
+  background: var(--surface-subtle);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   color: var(--text);
@@ -176,15 +181,15 @@ const statCards = computed(() => [
   transition: all 0.2s ease;
 }
 .action-btn:hover {
-  background: var(--accent);
-  border-color: var(--accent);
+  background: var(--brand);
+  border-color: var(--brand);
   color: #fff;
-  box-shadow: 0 4px 12px rgba(59,130,246,0.3);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
   transform: translateY(-1px);
 }
 .action-btn.green:hover {
-  background: var(--green);
-  border-color: var(--green);
-  box-shadow: 0 4px 12px rgba(34,197,94,0.3);
+  background: var(--success);
+  border-color: var(--success);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
 }
 </style>

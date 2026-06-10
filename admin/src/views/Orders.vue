@@ -177,7 +177,7 @@ const showDetail = async (row) => {
 
 const handleNewOrder = () => {
   loadOrders()
-  ElNotification({ title: '🆕 新订单', message: '订单列表已自动刷新', type: 'success', duration: 2000 })
+  ElNotification({ title: '新订单', message: '订单列表已自动刷新', type: 'success', duration: 2000 })
 }
 
 onMounted(() => { loadOrders(); window.addEventListener('new-order', handleNewOrder) })
@@ -195,7 +195,7 @@ onUnmounted(() => { window.removeEventListener('new-order', handleNewOrder) })
   display: flex; align-items: center; justify-content: center;
   transition: all .2s;
 }
-.refresh-btn:hover { border-color: var(--accent); color: var(--accent); }
+.refresh-btn:hover { border-color: var(--brand); color: var(--brand); }
 
 /* Filter tabs */
 .filter-tabs {
@@ -218,11 +218,11 @@ onUnmounted(() => { window.removeEventListener('new-order', handleNewOrder) })
   cursor: pointer;
   transition: all .2s;
 }
-.tab-item:hover { border-color: var(--accent); color: var(--text); }
+.tab-item:hover { border-color: var(--brand); color: var(--text); }
 .tab-item.active {
-  background: rgba(59,130,246,.15);
-  border-color: var(--accent);
-  color: var(--accent);
+  background: var(--brand-subtle);
+  border-color: var(--brand);
+  color: var(--brand);
 }
 .tab-dot {
   width: 8px; height: 8px;
@@ -258,12 +258,12 @@ onUnmounted(() => { window.removeEventListener('new-order', handleNewOrder) })
   font-size: 12px;
   font-weight: 500;
 }
-.status-badge.pending { background: rgba(234,179,8,.15); color: var(--yellow); }
-.status-badge.accepted { background: rgba(59,130,246,.15); color: var(--accent); }
-.status-badge.cooking { background: rgba(249,115,22,.15); color: #f97316; }
-.status-badge.ready { background: rgba(34,197,94,.15); color: var(--green); }
-.status-badge.done { background: rgba(148,163,184,.15); color: var(--text2); }
-.status-badge.cancelled { background: rgba(239,68,68,.15); color: var(--red); }
+.status-badge.pending { background: var(--warning-bg); color: var(--warning); }
+.status-badge.accepted { background: var(--info-bg); color: var(--info); }
+.status-badge.cooking { background: rgba(249,115,22,.08); color: #f97316; }
+.status-badge.ready { background: var(--success-bg); color: var(--success); }
+.status-badge.done { background: var(--surface-subtle); color: var(--text2); }
+.status-badge.cancelled { background: var(--danger-bg); color: var(--danger); }
 
 /* Action buttons */
 .action-btns { display: flex; gap: 6px; flex-wrap: wrap; }
@@ -276,22 +276,22 @@ onUnmounted(() => { window.removeEventListener('new-order', handleNewOrder) })
   cursor: pointer;
   transition: all .2s;
 }
-.btn-primary { background: var(--accent); color: #fff; }
-.btn-primary:hover { background: #2563eb; }
-.btn-success { background: var(--green); color: #fff; }
-.btn-success:hover { background: #16a34a; }
-.btn-warning { background: var(--yellow); color: #000; }
-.btn-warning:hover { background: #ca8a04; }
-.btn-danger { background: var(--red); color: #fff; }
-.btn-danger:hover { background: #dc2626; }
-.btn-info { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
-.btn-info:hover { border-color: var(--accent); }
+.btn-primary { background: var(--brand); color: #fff; border-color: var(--brand); }
+.btn-primary:hover { background: var(--brand-hover); border-color: var(--brand-hover); }
+.btn-success { background: var(--success); color: #fff; }
+.btn-success:hover { opacity: .9; }
+.btn-warning { background: var(--warning); color: #fff; }
+.btn-warning:hover { opacity: .9; }
+.btn-danger { background: var(--danger); color: #fff; }
+.btn-danger:hover { opacity: .9; }
+.btn-info { background: var(--surface); color: var(--text); border: 1px solid var(--border-strong); }
+.btn-info:hover { border-color: var(--brand); color: var(--brand); }
 .btn-ghost {
   background: transparent;
   color: var(--text2);
   border: 1px solid var(--border);
 }
-.btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+.btn-ghost:hover { background: var(--surface-hover); border-color: var(--brand); color: var(--brand); }
 
 /* Detail dialog */
 .detail-grid {

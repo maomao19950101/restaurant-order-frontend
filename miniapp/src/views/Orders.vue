@@ -71,46 +71,93 @@ onMounted(async () => {
   min-height: 100vh;
   background: var(--bg);
 }
+
+.orders-page :deep(.van-nav-bar) {
+  border-bottom: 1px solid var(--border);
+}
+
 .orders-content {
-  padding: 12px;
+  padding: 14px 12px;
 }
+
 .order-card {
-  background: #fff;
-  border-radius: 12px;
-  padding: 14px 16px;
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 16px;
   margin-bottom: 10px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
+
+.order-card:active {
+  transform: scale(0.985);
+}
+
 .order-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px;
-}
-.order-no {
-  font-size: 13px;
-  color: var(--text-secondary);
-}
-.order-items {
-  font-size: 14px;
-  line-height: 1.6;
   margin-bottom: 10px;
 }
-.order-item-name { color: var(--text); }
-.more { color: var(--text-secondary); }
+
+.order-no {
+  font-size: 13px;
+  color: var(--text3);
+  font-variant-numeric: tabular-nums;
+  font-weight: 400;
+}
+
+.order-items {
+  font-size: 14px;
+  line-height: 1.7;
+  margin-bottom: 10px;
+  color: var(--text);
+}
+
+.order-item-name {
+  color: var(--text);
+  font-weight: 500;
+}
+
+.more {
+  color: var(--text3);
+  font-weight: 400;
+}
+
 .order-footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-top: 8px;
-  border-top: 1px solid #f5f5f5;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
 }
+
 .order-time {
   font-size: 12px;
-  color: var(--text-secondary);
+  color: var(--text3);
+  font-variant-numeric: tabular-nums;
 }
+
 .order-footer .total {
-  font-size: 16px;
-  font-weight: 600;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+/* Empty state */
+.orders-page :deep(.van-empty) {
+  padding-top: 80px;
+}
+
+.orders-page :deep(.van-empty__description) {
+  color: var(--text3);
+  font-size: 14px;
+}
+
+/* Tabbar */
+.orders-page :deep(.van-tabbar) {
+  border-top: 1px solid var(--border);
+  box-shadow: 0 -1px 8px rgba(0, 0, 0, 0.02);
 }
 </style>

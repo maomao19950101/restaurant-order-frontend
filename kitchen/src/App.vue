@@ -3,7 +3,7 @@
     <!-- 顶部导航 -->
     <header class="header">
       <div class="header-left">
-        <div class="logo">🍳</div>
+        <div class="logo">K</div>
         <div class="header-info">
           <h1>厨房出餐系统</h1>
           <span class="restaurant-name">{{ restaurantName }}</span>
@@ -21,7 +21,7 @@
       </nav>
       <div class="header-right">
         <div class="live-clock">
-          <span class="clock-icon">🕐</span>
+          <span class="clock-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></span>
           <span class="clock-text">{{ currentTime }}</span>
         </div>
         <div class="online-dot"></div>
@@ -45,7 +45,7 @@
               <div class="card-top">
                 <div class="table-tag">{{ order.tableNo || '桌' + order.tableId }}</div>
                 <div class="time-tag">
-                  <span v-if="isUrgent(order)" class="urgent-icon">⚠️</span>
+                  <span v-if="isUrgent(order)" class="urgent-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
                   {{ formatTime(order.createdAt) }}
                 </div>
               </div>
@@ -62,7 +62,7 @@
             </div>
           </TransitionGroup>
           <div v-if="pendingOrders.length === 0" class="empty-state">
-            <div class="empty-icon">✅</div>
+            <div class="empty-icon"><svg width="40" height="40" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="20" cy="20" r="16" stroke-opacity="0.3"/><path d="M14 20l4 4 8-8" stroke-opacity="0.5"/></svg></div>
             <p>暂无待制作订单</p>
           </div>
         </div>
@@ -83,7 +83,7 @@
               <div class="card-top">
                 <div class="table-tag cooking-tag">{{ order.tableNo || '桌' + order.tableId }}</div>
                 <div class="time-tag">
-                  <span v-if="isUrgent(order)" class="urgent-icon">⚠️</span>
+                  <span v-if="isUrgent(order)" class="urgent-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
                   {{ formatTime(order.createdAt) }}
                 </div>
               </div>
@@ -100,7 +100,7 @@
             </div>
           </TransitionGroup>
           <div v-if="cookingOrders.length === 0" class="empty-state">
-            <div class="empty-icon">👨‍🍳</div>
+            <div class="empty-icon"><svg width="40" height="40" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 28h16v-4c0-1-1-2-2-2H14c-1 0-2 1-2 2v4z" stroke-opacity="0.3"/><path d="M14 22v-4a6 6 0 0 1 12 0v4" stroke-opacity="0.5"/><circle cx="16" cy="14" r="3" stroke-opacity="0.3"/><circle cx="24" cy="14" r="3" stroke-opacity="0.3"/><circle cx="20" cy="12" r="3" stroke-opacity="0.3"/></svg></div>
             <p>暂无制作中订单</p>
           </div>
         </div>
@@ -131,7 +131,7 @@
             </div>
           </TransitionGroup>
           <div v-if="doneOrders.length === 0" class="empty-state">
-            <div class="empty-icon">📋</div>
+            <div class="empty-icon"><svg width="40" height="40" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="10" y="8" width="20" height="24" rx="2" stroke-opacity="0.3"/><path d="M16 8V6a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke-opacity="0.3"/><line x1="14" y1="16" x2="26" y2="16" stroke-opacity="0.5"/><line x1="14" y1="22" x2="26" y2="22" stroke-opacity="0.5"/><line x1="14" y1="28" x2="22" y2="28" stroke-opacity="0.5"/></svg></div>
             <p>暂无已出餐订单</p>
           </div>
         </div>
@@ -143,35 +143,31 @@
       <!-- 时间段选择 -->
       <div class="period-bar">
         <button v-for="p in periods" :key="p.value" class="period-pill" :class="{ active: selectedPeriod === p.value }" @click="selectedPeriod = p.value; loadStats()">
-          {{ p.icon }} {{ p.label }}
+          {{ p.label }}
         </button>
       </div>
 
       <!-- 数据卡片 -->
       <div class="stat-cards">
         <div class="stat-card card-orders">
-          <div class="stat-icon">📦</div>
           <div class="stat-content">
             <div class="stat-number">{{ statsData.totalOrders || 0 }}</div>
             <div class="stat-name">总订单</div>
           </div>
         </div>
         <div class="stat-card card-revenue">
-          <div class="stat-icon">💰</div>
           <div class="stat-content">
             <div class="stat-number">¥{{ formatMoney(statsData.totalAmount) }}</div>
             <div class="stat-name">总营收</div>
           </div>
         </div>
         <div class="stat-card card-types">
-          <div class="stat-icon">🍽️</div>
           <div class="stat-content">
             <div class="stat-number">{{ statsData.dishes?.length || 0 }}</div>
             <div class="stat-name">菜品种类</div>
           </div>
         </div>
         <div class="stat-card card-quantity">
-          <div class="stat-icon">📊</div>
           <div class="stat-content">
             <div class="stat-number">{{ totalDishQuantity }}</div>
             <div class="stat-name">总出餐</div>
@@ -182,12 +178,12 @@
       <!-- 排行榜 -->
       <div class="ranking-panel">
         <div class="ranking-header">
-          <h3>🏆 菜品销量排行榜</h3>
+          <h3>菜品销量排行榜</h3>
           <span class="ranking-sub">{{ periodLabel(selectedPeriod) }}</span>
         </div>
         <div class="ranking-body">
           <div v-for="(dish, i) in statsData.dishes" :key="dish.dishId" class="rank-row" :class="{ 'top-3': i < 3 }">
-            <div class="rank-num" :class="'rank-' + (i + 1)">{{ i < 3 ? ['🥇','🥈','🥉'][i] : i + 1 }}</div>
+            <div class="rank-num" :class="['rank-' + (i + 1), { top: i < 3 }]">{{ i + 1 }}</div>
             <div class="rank-name">{{ dish.dishName }}</div>
             <div class="rank-bar-col">
               <div class="rank-bar-track">
@@ -198,7 +194,7 @@
             <div class="rank-amount">¥{{ formatMoney(dish.amount) }}</div>
           </div>
           <div v-if="!statsData.dishes?.length" class="empty-ranking">
-            <div class="empty-icon">📊</div>
+            <div class="empty-icon"><svg width="32" height="32" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="10" y="8" width="20" height="24" rx="2" stroke-opacity="0.3"/><path d="M16 8V6a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke-opacity="0.3"/><line x1="14" y1="16" x2="26" y2="16" stroke-opacity="0.5"/><line x1="14" y1="22" x2="26" y2="22" stroke-opacity="0.5"/><line x1="14" y1="28" x2="22" y2="28" stroke-opacity="0.5"/></svg></div>
             <p>暂无销售数据</p>
           </div>
         </div>
@@ -221,12 +217,12 @@ const doneOrders = ref([])
 const selectedPeriod = ref('today')
 const statsData = ref({})
 const periods = [
-  { value: 'today', label: '今日', icon: '📅' },
-  { value: 'week', label: '本周', icon: '📆' },
-  { value: 'month', label: '本月', icon: '🗓️' },
-  { value: 'quarter', label: '季度', icon: '📊' },
-  { value: 'halfYear', label: '半年', icon: '📈' },
-  { value: 'year', label: '全年', icon: '🎯' },
+  { value: 'today', label: '今日', icon: '' },
+  { value: 'week', label: '本周', icon: '' },
+  { value: 'month', label: '本月', icon: '' },
+  { value: 'quarter', label: '季度', icon: '' },
+  { value: 'halfYear', label: '半年', icon: '' },
+  { value: 'year', label: '全年', icon: '' },
 ]
 
 const totalDishQuantity = computed(() => {
@@ -319,228 +315,713 @@ onUnmounted(() => { clearInterval(timeTimer); clearInterval(pollTimer) })
 </script>
 
 <style>
-/* ========== 全局 ========== */
-* { margin: 0; padding: 0; box-sizing: border-box; }
+/* ========== Design Tokens ========== */
 :root {
-  --bg: #0f172a;
-  --surface: #1e293b;
-  --surface2: #273548;
-  --border: #334155;
-  --text: #f1f5f9;
-  --text2: #94a3b8;
-  --accent: #3b82f6;
-  --green: #22c55e;
-  --yellow: #eab308;
-  --red: #ef4444;
-  --orange: #f97316;
-  --purple: #a855f7;
-  --radius: 12px;
-  --shadow: 0 4px 24px rgba(0,0,0,.3);
+  --bg: #0c0d0f;
+  --surface: #1a1b1e;
+  --surface2: #222326;
+  --border: rgba(255,255,255,0.06);
+  --border-strong: rgba(255,255,255,0.12);
+  --text: #f1f3f5;
+  --text2: #9ca3af;
+  --brand: #6366f1;
+  --brand-hover: #5558e6;
+  --success: #10b981;
+  --success-hover: #0d9668;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --radius: 10px;
+  --radius-sm: 6px;
+  --radius-lg: 14px;
+  --shadow: 0 2px 12px rgba(0,0,0,.25);
+  --transition: .2s cubic-bezier(.4,0,.2,1);
 }
-body { background: var(--bg); font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif; color: var(--text); }
-.kitchen-app { min-height: 100vh; display: flex; flex-direction: column; }
 
-/* ========== 头部 ========== */
+.kitchen-app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+}
+
+/* ========== Header ========== */
 .header {
   background: var(--surface);
   border-bottom: 1px solid var(--border);
-  padding: 0 24px;
-  height: 64px;
+  padding: 0 28px;
+  height: 60px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  position: sticky; top: 0; z-index: 100;
-  backdrop-filter: blur(12px);
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
-.header-left { display: flex; align-items: center; gap: 12px; }
-.logo { font-size: 28px; }
-.header-info h1 { font-size: 18px; font-weight: 700; letter-spacing: -.5px; }
-.restaurant-name { font-size: 12px; color: var(--text2); }
 
-.header-nav { display: flex; gap: 4px; }
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.logo {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--brand), #8b5cf6);
+  border-radius: var(--radius-sm);
+  font-size: 18px;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: -1px;
+}
+
+.header-info h1 {
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -.3px;
+  color: var(--text);
+}
+
+.restaurant-name {
+  font-size: 12px;
+  color: var(--text2);
+  font-weight: 400;
+}
+
+/* ========== Navigation ========== */
+.header-nav {
+  display: flex;
+  gap: 6px;
+  background: var(--surface2);
+  padding: 4px;
+  border-radius: var(--radius);
+}
+
 .nav-btn {
-  display: flex; align-items: center; gap: 6px;
-  background: transparent; border: none; color: var(--text2);
-  padding: 8px 16px; border-radius: 8px; cursor: pointer;
-  font-size: 14px; font-weight: 500; transition: all .2s;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: transparent;
+  border: none;
+  color: var(--text2);
+  padding: 8px 18px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all var(--transition);
 }
-.nav-btn svg { width: 18px; height: 18px; }
-.nav-btn:hover { background: var(--surface2); color: var(--text); }
-.nav-btn.active { background: var(--accent); color: #fff; }
 
-.header-right { display: flex; align-items: center; gap: 16px; }
+.nav-btn svg {
+  width: 16px;
+  height: 16px;
+  opacity: .7;
+}
+
+.nav-btn:hover {
+  color: var(--text);
+  background: rgba(255,255,255,.05);
+}
+
+.nav-btn:hover svg {
+  opacity: 1;
+}
+
+.nav-btn.active {
+  background: var(--brand);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(99,102,241,.3);
+}
+
+.nav-btn.active svg {
+  opacity: 1;
+}
+
+/* ========== Header Right ========== */
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
 .live-clock {
-  display: flex; align-items: center; gap: 6px;
-  background: var(--surface2); padding: 6px 14px; border-radius: 8px;
-}
-.clock-icon { font-size: 14px; }
-.clock-text { font-family: 'SF Mono', 'Consolas', monospace; font-size: 15px; font-weight: 600; color: var(--accent); letter-spacing: 1px; }
-.online-dot { width: 8px; height: 8px; background: var(--green); border-radius: 50%; animation: pulse-dot 2s infinite; }
-@keyframes pulse-dot { 0%,100% { opacity: 1; } 50% { opacity: .4; } }
-
-/* ========== 订单看板 ========== */
-.board {
-  flex: 1; display: grid; grid-template-columns: repeat(3, 1fr);
-  gap: 16px; padding: 16px; overflow: hidden;
-}
-.board-col {
-  background: var(--surface); border-radius: var(--radius);
-  display: flex; flex-direction: column; overflow: hidden;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: var(--radius-sm);
+  background: rgba(255,255,255,.03);
   border: 1px solid var(--border);
 }
+
+.clock-icon {
+  font-size: 13px;
+  opacity: .6;
+}
+
+.clock-text {
+  font-family: 'JetBrains Mono', 'SF Mono', 'Consolas', monospace;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text2);
+  letter-spacing: .5px;
+}
+
+.online-dot {
+  width: 8px;
+  height: 8px;
+  background: var(--success);
+  border-radius: 50%;
+  box-shadow: 0 0 8px rgba(16,185,129,.5);
+  animation: pulse-dot 2s infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .4; }
+}
+
+/* ========== Board Layout ========== */
+.board {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  padding: 20px 24px;
+  overflow: hidden;
+}
+
+.board-col {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+
+/* ========== Column Headers ========== */
 .col-header {
-  padding: 14px 16px; display: flex; justify-content: space-between; align-items: center;
+  padding: 16px 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   border-bottom: 1px solid var(--border);
 }
-.col-title { display: flex; align-items: center; gap: 8px; }
-.col-title h2 { font-size: 15px; font-weight: 600; }
-.status-dot { width: 10px; height: 10px; border-radius: 50%; }
-.pending-dot { background: var(--yellow); }
-.cooking-dot { background: var(--accent); animation: pulse-dot 1.5s infinite; }
-.done-dot { background: var(--green); }
+
+.col-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.col-title h2 {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.pending-dot {
+  background: var(--warning);
+  box-shadow: 0 0 6px rgba(245,158,11,.4);
+}
+
+.cooking-dot {
+  background: var(--brand);
+  box-shadow: 0 0 6px rgba(99,102,241,.4);
+  animation: pulse-dot 1.5s infinite;
+}
+
+.done-dot {
+  background: var(--success);
+  box-shadow: 0 0 6px rgba(16,185,129,.4);
+}
+
 .badge {
-  font-size: 13px; font-weight: 700; padding: 2px 10px; border-radius: 20px;
-  min-width: 28px; text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 20px;
+  min-width: 26px;
+  text-align: center;
 }
-.pending-badge { background: rgba(234,179,8,.15); color: var(--yellow); }
-.cooking-badge { background: rgba(59,130,246,.15); color: var(--accent); }
-.done-badge { background: rgba(34,197,94,.15); color: var(--green); }
 
-.col-body { flex: 1; overflow-y: auto; padding: 12px; }
-.col-body::-webkit-scrollbar { width: 4px; }
-.col-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+.pending-badge {
+  background: rgba(245,158,11,.12);
+  color: var(--warning);
+}
 
-/* ========== 订单卡片 ========== */
+.cooking-badge {
+  background: rgba(99,102,241,.12);
+  color: var(--brand);
+}
+
+.done-badge {
+  background: rgba(16,185,129,.12);
+  color: var(--success);
+}
+
+/* ========== Column Body ========== */
+.col-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 14px;
+}
+
+.col-body::-webkit-scrollbar {
+  width: 4px;
+}
+
+.col-body::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,.08);
+  border-radius: 4px;
+}
+
+/* ========== Order Cards ========== */
 .order-card {
-  background: var(--surface2); border-radius: 10px; padding: 14px;
-  margin-bottom: 10px; border: 1px solid var(--border);
-  transition: all .3s;
+  background: var(--surface2);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 14px;
+  border: 1px solid var(--border);
+  transition: all var(--transition);
 }
-.order-card:hover { border-color: var(--accent); transform: translateY(-1px); }
-.order-card.cooking { border-left: 3px solid var(--accent); }
-.order-card.done { border-left: 3px solid var(--green); opacity: .65; }
-.order-card.urgent { border-left: 3px solid var(--red); animation: card-urgent 2s infinite; }
+
+.order-card:hover {
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow);
+}
+
+.order-card.cooking {
+  border-left: 3px solid var(--brand);
+}
+
+.order-card.cooking:hover {
+  border-color: var(--brand);
+}
+
+.order-card.done {
+  border-left: 3px solid var(--success);
+  opacity: .55;
+}
+
+.order-card.urgent {
+  border-left: 3px solid var(--danger);
+  animation: card-urgent 2.5s infinite;
+}
+
 @keyframes card-urgent {
-  0%,100% { box-shadow: 0 0 0 0 rgba(239,68,68,.3); }
-  50% { box-shadow: 0 0 0 6px rgba(239,68,68,0); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(239,68,68,.25); }
+  50% { box-shadow: 0 0 0 5px rgba(239,68,68,0); }
 }
 
-.card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
 .table-tag {
-  background: rgba(234,179,8,.15); color: var(--yellow);
-  padding: 3px 10px; border-radius: 6px; font-size: 13px; font-weight: 700;
+  background: rgba(245,158,11,.1);
+  color: var(--warning);
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 600;
 }
-.table-tag.cooking-tag { background: rgba(59,130,246,.15); color: var(--accent); }
-.table-tag.done-tag { background: rgba(34,197,94,.15); color: var(--green); }
-.time-tag { font-size: 12px; color: var(--text2); display: flex; align-items: center; gap: 4px; }
-.urgent-icon { font-size: 14px; }
 
-.card-items { margin-bottom: 12px; }
+.table-tag.cooking-tag {
+  background: rgba(99,102,241,.1);
+  color: var(--brand);
+}
+
+.table-tag.done-tag {
+  background: rgba(16,185,129,.1);
+  color: var(--success);
+}
+
+.time-tag {
+  font-size: 12px;
+  color: var(--text2);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-family: 'JetBrains Mono', 'SF Mono', monospace;
+}
+
+.urgent-icon {
+  font-size: 13px;
+}
+
+.card-items {
+  margin-bottom: 14px;
+}
+
 .card-item {
-  display: flex; justify-content: space-between; align-items: center;
-  padding: 4px 0; font-size: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 0;
+  font-size: 13px;
+  border-bottom: 1px solid var(--border);
 }
-.item-name { color: var(--text); }
-.item-qty { color: var(--accent); font-weight: 700; font-size: 15px; }
 
+.card-item:last-child {
+  border-bottom: none;
+}
+
+.item-name {
+  color: var(--text);
+  font-weight: 450;
+}
+
+.item-qty {
+  color: var(--brand);
+  font-weight: 700;
+  font-size: 14px;
+}
+
+/* ========== Buttons ========== */
 .btn {
-  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
-  width: 100%; padding: 9px 0; border: none; border-radius: 8px;
-  font-size: 14px; font-weight: 600; cursor: pointer; transition: all .2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  width: 100%;
+  padding: 10px 0;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition);
 }
-.btn svg { width: 16px; height: 16px; }
-.btn-primary { background: var(--accent); color: #fff; }
-.btn-primary:hover { background: #2563eb; }
-.btn-success { background: var(--green); color: #fff; }
-.btn-success:hover { background: #16a34a; }
 
-.empty-state { text-align: center; padding: 48px 16px; color: var(--text2); }
-.empty-icon { font-size: 40px; margin-bottom: 8px; }
+.btn svg {
+  width: 15px;
+  height: 15px;
+}
 
-/* ========== 卡片动画 ========== */
-.card-enter-active { animation: card-in .3s ease-out; }
-.card-leave-active { animation: card-out .2s ease-in; }
-@keyframes card-in { from { opacity: 0; transform: translateY(-10px) scale(.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
-@keyframes card-out { to { opacity: 0; transform: translateX(30px); } }
+.btn-primary {
+  background: var(--brand);
+  color: #fff;
+}
 
-/* ========== 统计页 ========== */
-.stats-page { flex: 1; padding: 20px 24px; overflow-y: auto; }
+.btn-primary:hover {
+  background: var(--brand-hover);
+  box-shadow: 0 4px 12px rgba(99,102,241,.3);
+}
 
-.period-bar { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+.btn-success {
+  background: var(--success);
+  color: #fff;
+}
+
+.btn-success:hover {
+  background: var(--success-hover);
+  box-shadow: 0 4px 12px rgba(16,185,129,.3);
+}
+
+/* ========== Empty States ========== */
+.empty-state {
+  text-align: center;
+  padding: 56px 20px;
+  color: var(--text2);
+}
+
+.empty-icon {
+  font-size: 36px;
+  margin-bottom: 10px;
+  opacity: .6;
+}
+
+.empty-state p {
+  font-size: 13px;
+}
+
+/* ========== Card Animations ========== */
+.card-enter-active {
+  animation: card-in .35s ease-out;
+}
+
+.card-leave-active {
+  animation: card-out .25s ease-in;
+}
+
+@keyframes card-in {
+  from { opacity: 0; transform: translateY(-12px) scale(.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes card-out {
+  to { opacity: 0; transform: translateX(24px) scale(.95); }
+}
+
+/* ========== Stats Page ========== */
+.stats-page {
+  flex: 1;
+  padding: 24px 28px;
+  overflow-y: auto;
+}
+
+/* ========== Period Bar ========== */
+.period-bar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  background: var(--surface);
+  padding: 6px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  width: fit-content;
+}
+
 .period-pill {
-  background: var(--surface); border: 1px solid var(--border); color: var(--text2);
-  padding: 8px 18px; border-radius: 24px; cursor: pointer;
-  font-size: 13px; font-weight: 500; transition: all .2s;
+  background: transparent;
+  border: none;
+  color: var(--text2);
+  padding: 8px 18px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all var(--transition);
 }
-.period-pill:hover { border-color: var(--accent); color: var(--text); }
-.period-pill.active { background: var(--accent); border-color: var(--accent); color: #fff; }
 
-.stat-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 20px; }
+.period-pill:hover {
+  color: var(--text);
+  background: rgba(255,255,255,.04);
+}
+
+.period-pill.active {
+  background: var(--brand);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(99,102,241,.25);
+}
+
+/* ========== Stat Cards ========== */
+.stat-cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
 .stat-card {
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: var(--radius); padding: 18px;
-  display: flex; align-items: center; gap: 14px;
-  transition: all .2s;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  transition: all var(--transition);
 }
-.stat-card:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: var(--shadow); }
-.stat-icon { font-size: 32px; }
-.stat-number { font-size: 26px; font-weight: 800; letter-spacing: -.5px; }
-.stat-name { font-size: 12px; color: var(--text2); margin-top: 2px; }
-.card-orders .stat-number { color: var(--accent); }
-.card-revenue .stat-number { color: var(--green); }
-.card-types .stat-number { color: var(--orange); }
-.card-quantity .stat-number { color: var(--purple); }
 
-/* ========== 排行榜 ========== */
+.stat-card:hover {
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow);
+  transform: translateY(-2px);
+}
+
+.stat-icon {
+  font-size: 28px;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface2);
+  border-radius: var(--radius);
+}
+
+.stat-number {
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -.5px;
+}
+
+.stat-name {
+  font-size: 12px;
+  color: var(--text2);
+  margin-top: 3px;
+  font-weight: 450;
+}
+
+.card-orders .stat-number { color: var(--brand); }
+.card-revenue .stat-number { color: var(--success); }
+.card-types .stat-number { color: var(--warning); }
+.card-quantity .stat-number { color: #a78bfa; }
+
+/* ========== Ranking Panel ========== */
 .ranking-panel {
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: var(--radius); overflow: hidden;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
 }
-.ranking-header {
-  padding: 16px 20px; border-bottom: 1px solid var(--border);
-  display: flex; justify-content: space-between; align-items: center;
-}
-.ranking-header h3 { font-size: 16px; font-weight: 700; }
-.ranking-sub { font-size: 13px; color: var(--text2); }
 
-.ranking-body { padding: 8px 16px; }
-.rank-row {
-  display: grid; grid-template-columns: 48px 120px 1fr 70px 80px;
-  align-items: center; gap: 12px; padding: 10px 4px;
-  border-bottom: 1px solid var(--border); transition: background .15s;
+.ranking-header {
+  padding: 18px 22px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
-.rank-row:last-child { border-bottom: none; }
-.rank-row:hover { background: var(--surface2); }
-.rank-row.top-3 { background: rgba(59,130,246,.04); }
+
+.ranking-header h3 {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.ranking-sub {
+  font-size: 12px;
+  color: var(--text2);
+  background: var(--surface2);
+  padding: 4px 12px;
+  border-radius: var(--radius-sm);
+}
+
+.ranking-body {
+  padding: 10px 18px;
+}
+
+.rank-row {
+  display: grid;
+  grid-template-columns: 44px 130px 1fr 72px 80px;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 6px;
+  border-bottom: 1px solid var(--border);
+  transition: background var(--transition);
+  border-radius: var(--radius-sm);
+}
+
+.rank-row:last-child {
+  border-bottom: none;
+}
+
+.rank-row:hover {
+  background: rgba(255,255,255,.02);
+}
+
+.rank-row.top-3 {
+  background: rgba(99,102,241,.03);
+}
+
+.rank-row.top-3:hover {
+  background: rgba(99,102,241,.06);
+}
 
 .rank-num {
-  width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
-  border-radius: 8px; font-size: 14px; font-weight: 700; background: var(--surface2); color: var(--text2);
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 700;
+  background: var(--surface2);
+  color: var(--text2);
 }
-.rank-1 { background: linear-gradient(135deg,#fbbf24,#f59e0b); color: #000; }
-.rank-2 { background: linear-gradient(135deg,#d1d5db,#9ca3af); color: #000; }
-.rank-3 { background: linear-gradient(135deg,#d97706,#b45309); color: #fff; }
 
-.rank-name { font-size: 14px; font-weight: 500; }
+.rank-num.top {
+  color: #f59e0b;
+  font-weight: 800;
+}
 
-.rank-bar-col { padding-right: 8px; }
-.rank-bar-track { height: 8px; background: var(--surface2); border-radius: 4px; overflow: hidden; }
-.rank-bar-fill { height: 100%; border-radius: 4px; transition: width .6s ease; }
-.bar-1 { background: linear-gradient(90deg, var(--accent), var(--green)); }
-.bar-2 { background: linear-gradient(90deg, var(--accent), var(--purple)); }
-.bar-3 { background: linear-gradient(90deg, var(--orange), var(--yellow)); }
-.rank-bar-fill:not(.bar-1):not(.bar-2):not(.bar-3) { background: var(--border); }
+.rank-1 {
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  color: #000;
+}
 
-.rank-qty { font-size: 14px; font-weight: 700; color: var(--accent); text-align: right; }
-.rank-amount { font-size: 13px; color: var(--text2); text-align: right; }
+.rank-2 {
+  background: linear-gradient(135deg, #d1d5db, #9ca3af);
+  color: #1a1b1e;
+}
 
-.empty-ranking { text-align: center; padding: 48px; color: var(--text2); }
+.rank-3 {
+  background: linear-gradient(135deg, #d97706, #b45309);
+  color: #fff;
+}
 
-/* ========== 响应式 ========== */
+.rank-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.rank-bar-col {
+  padding-right: 8px;
+}
+
+.rank-bar-track {
+  height: 6px;
+  background: var(--surface2);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.rank-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width .7s cubic-bezier(.4,0,.2,1);
+}
+
+.bar-1 { background: linear-gradient(90deg, var(--brand), #8b5cf6); }
+.bar-2 { background: linear-gradient(90deg, var(--brand), var(--success)); }
+.bar-3 { background: linear-gradient(90deg, var(--warning), #fb923c); }
+.rank-bar-fill:not(.bar-1):not(.bar-2):not(.bar-3) { background: var(--border-strong); }
+
+.rank-qty {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--brand);
+  text-align: right;
+}
+
+.rank-amount {
+  font-size: 12px;
+  color: var(--text2);
+  text-align: right;
+  font-family: 'JetBrains Mono', 'SF Mono', monospace;
+}
+
+.empty-ranking {
+  text-align: center;
+  padding: 56px;
+  color: var(--text2);
+}
+
+/* ========== Responsive ========== */
 @media (max-width: 1024px) {
-  .board { grid-template-columns: 1fr; }
-  .board-col { min-height: 300px; }
-  .stat-cards { grid-template-columns: repeat(2, 1fr); }
-  .rank-row { grid-template-columns: 40px 100px 1fr 60px 70px; font-size: 13px; }
+  .board {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  .board-col {
+    min-height: 280px;
+  }
+  .stat-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .rank-row {
+    grid-template-columns: 40px 110px 1fr 64px 72px;
+    font-size: 12px;
+    gap: 10px;
+  }
 }
 </style>

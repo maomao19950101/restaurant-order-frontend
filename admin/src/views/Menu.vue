@@ -27,7 +27,7 @@
       <div v-for="dish in dishes" :key="dish.id" class="dish-card">
         <div class="dish-image">
           <img v-if="dish.imageUrl" :src="dish.imageUrl" :alt="dish.name" />
-          <div v-else class="dish-placeholder">🍜</div>
+          <div v-else class="dish-placeholder">{{ dish.name ? dish.name[0] : '' }}</div>
           <span :class="['dish-status', dish.status === 1 ? 'on' : 'off']">
             {{ dish.status === 1 ? '上架' : '下架' }}
           </span>
@@ -56,7 +56,14 @@
         </div>
       </div>
       <div v-if="!loading && dishes.length === 0" class="empty-state">
-        <div class="empty-icon">🍽️</div>
+        <div class="empty-icon">
+          <svg width="48" height="48" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+            <ellipse cx="24" cy="28" rx="16" ry="6"/>
+            <path d="M8 28c0 0 0 10 16 10s16-10 16-10"/>
+            <path d="M18 18c0-4 2-8 6-8s6 4 6 8"/>
+            <line x1="20" y1="14" x2="20" y2="22"/><line x1="24" y1="12" x2="24" y2="22"/><line x1="28" y1="14" x2="28" y2="22"/>
+          </svg>
+        </div>
         <div class="empty-text">暂无菜品</div>
       </div>
     </div>
@@ -255,11 +262,11 @@ onMounted(() => { loadCategories(); loadDishes() })
   cursor: pointer;
   transition: all .2s;
 }
-.cat-tab:hover { border-color: var(--accent); color: var(--text); }
+.cat-tab:hover { border-color: var(--brand); color: var(--text); }
 .cat-tab.active {
-  background: rgba(59,130,246,.15);
-  border-color: var(--accent);
-  color: var(--accent);
+  background: var(--brand-subtle);
+  border-color: var(--brand);
+  color: var(--brand);
 }
 
 /* Dish grid */
@@ -275,7 +282,7 @@ onMounted(() => { loadCategories(); loadDishes() })
   overflow: hidden;
   transition: border-color .2s, transform .2s;
 }
-.dish-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+.dish-card:hover { border-color: var(--brand); transform: translateY(-2px); }
 .dish-image {
   height: 160px;
   position: relative;
@@ -288,6 +295,8 @@ onMounted(() => { loadCategories(); loadDishes() })
   display: flex; align-items: center; justify-content: center;
   font-size: 48px;
   background: var(--surface2);
+  color: var(--text2);
+  font-weight: 700;
 }
 .dish-status {
   position: absolute;
@@ -308,7 +317,7 @@ onMounted(() => { loadCategories(); loadDishes() })
   align-items: center;
   margin-bottom: 6px;
 }
-.dish-price { font-size: 18px; font-weight: 700; color: var(--green); }
+.dish-price { font-size: 18px; font-weight: 700; color: var(--success); }
 .dish-sales { font-size: 12px; color: var(--text2); }
 .dish-stock { font-size: 12px; color: var(--text2); margin-bottom: 12px; }
 .dish-actions { display: flex; gap: 6px; }
@@ -319,7 +328,7 @@ onMounted(() => { loadCategories(); loadDishes() })
   text-align: center;
   padding: 60px 20px;
 }
-.empty-icon { font-size: 48px; margin-bottom: 12px; }
+.empty-icon { font-size: 48px; margin-bottom: 12px; color: var(--text-tertiary, #94a3b8); opacity: 0.6; }
 .empty-text { color: var(--text2); font-size: 14px; }
 
 /* Buttons */
@@ -333,27 +342,27 @@ onMounted(() => { loadCategories(); loadDishes() })
   transition: all .2s;
 }
 .btn-sm { padding: 4px 10px; font-size: 12px; }
-.btn-primary { background: var(--accent); color: #fff; }
-.btn-primary:hover { background: #2563eb; }
+.btn-primary { background: var(--brand); color: #fff; border-color: var(--brand); }
+.btn-primary:hover { background: var(--brand-hover); border-color: var(--brand-hover); }
 .btn-primary:disabled { opacity: .6; cursor: not-allowed; }
-.btn-success { background: var(--green); color: #fff; }
-.btn-success:hover { background: #16a34a; }
-.btn-warning { background: var(--yellow); color: #000; }
-.btn-warning:hover { background: #ca8a04; }
-.btn-danger { background: var(--red); color: #fff; }
-.btn-danger:hover { background: #dc2626; }
+.btn-success { background: var(--success); color: #fff; }
+.btn-success:hover { opacity: .9; }
+.btn-warning { background: var(--warning); color: #fff; }
+.btn-warning:hover { opacity: .9; }
+.btn-danger { background: var(--danger); color: #fff; }
+.btn-danger:hover { opacity: .9; }
 .btn-outline {
   background: transparent;
   color: var(--text);
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-strong);
 }
-.btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+.btn-outline:hover { border-color: var(--brand); color: var(--brand); }
 .btn-ghost {
   background: transparent;
   color: var(--text2);
   border: 1px solid var(--border);
 }
-.btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+.btn-ghost:hover { background: var(--surface-hover); border-color: var(--brand); color: var(--brand); }
 
 /* Spec row */
 .spec-row {
@@ -371,7 +380,7 @@ onMounted(() => { loadCategories(); loadDishes() })
   overflow: hidden;
   transition: border-color .3s;
 }
-.dish-uploader:hover { border-color: var(--accent); }
+.dish-uploader:hover { border-color: var(--brand); }
 .dish-preview { width: 120px; height: 120px; display: block; object-fit: cover; }
 .upload-placeholder {
   width: 120px; height: 120px;
