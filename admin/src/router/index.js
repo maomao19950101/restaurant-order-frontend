@@ -12,6 +12,7 @@ const routes = [
   { path: '/reviews', name: 'Reviews', component: () => import('../views/Reviews.vue'), meta: { title: '评价管理', icon: 'Star' } },
   { path: '/reports', name: 'Reports', component: () => import('../views/Reports.vue'), meta: { title: '数据分析', icon: 'Chart' } },
   { path: '/combos', name: 'Combos', component: () => import('../views/Combos.vue'), meta: { title: '套餐管理', icon: 'Dish' } },
+  { path: '/receipt-templates', name: 'ReceiptTemplates', component: () => import('../views/ReceiptTemplates.vue'), meta: { title: '小票模板', icon: 'Setting' } },
 ]
 
 const router = createRouter({

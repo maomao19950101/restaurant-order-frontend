@@ -111,6 +111,17 @@ export const getReviewStats = () => api.get('/admin/review/stats', { params: { r
 export const replyReview = (id, content) => api.post(`/admin/review/${id}/reply`, { content })
 export const updateReviewStatus = (id, status) => api.put(`/admin/review/${id}/status`, { status })
 
+// ============ 桌台合并/拆单 ============
+export const mergeTables = (data) => api.post('/admin/table-merge/merge', data, { params: { restaurantId: getRestaurantId() } })
+export const splitTable = (primaryTableId, mergedTableId) => api.post('/admin/table-merge/split', null, { params: { restaurantId: getRestaurantId(), primaryTableId, mergedTableId } })
+export const getMergedTables = (tableId) => api.get('/admin/table-merge/merged', { params: { restaurantId: getRestaurantId(), tableId } })
+export const mergeCheckout = (tableIds) => api.post('/admin/table-merge/checkout', tableIds, { params: { restaurantId: getRestaurantId() } })
+
+// ============ 小票模板 ============
+export const getReceiptTemplates = () => api.get('/admin/receipt/templates', { params: { restaurantId: getRestaurantId() } })
+export const saveReceiptTemplate = (data) => api.post('/admin/receipt/template', { ...data, restaurantId: getRestaurantId() })
+export const previewReceipt = (orderId) => api.get(`/admin/receipt/preview/${orderId}`)
+
 // ============ 套餐管理 ============
 export const getCombos = () => api.get('/admin/combo/list', { params: { restaurantId: getRestaurantId() } })
 export const getComboDetail = (id) => api.get(`/admin/combo/${id}`)

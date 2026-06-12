@@ -2,7 +2,10 @@
   <div>
     <div class="page-header">
       <h2>桌台管理</h2>
-      <el-button type="success" @click="openDialog()">新增桌台</el-button>
+      <div style="display: flex; gap: 10px">
+        <el-button type="warning" @click="openMergeDialog">合并桌台</el-button>
+        <el-button type="success" @click="openDialog()">新增桌台</el-button>
+      </div>
     </div>
 
     <el-row :gutter="16">
@@ -57,13 +60,33 @@
         <el-button type="primary" @click="printQR">打印</el-button>
       </template>
     </el-dialog>
+
+    <!-- 合并桌台 Dialog -->
+    <el-dialog v-model="mergeDialogVisible" title="合并桌台" width="500">
+      <el-form label-width="80px">
+        <el-form-item label="主桌台">
+          <el-select v-model="mergeForm.primaryTableId" placeholder="选择主桌台" style="width: 100%">
+            <el-option v-for="t in tables" :key="t.id" :label="t.tableNo + ' (' + t.seats + '人)'" :value="t.id" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="合并桌台">
+          <el-select v-model="mergeForm.mergedTableIds" multiple placeholder="选择要合并的桌台" style="width: 100%">
+            <el-option v-for="t in tables.filter(t => t.id !== mergeForm.primaryTableId)" :key="t.id" :label="t.tableNo + ' (' + t.seats + '人)'" :value="t.id" />
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="mergeDialogVisible = false">取消</el-button>
+        <el-button type="primary" @click="handleMerge">确认合并</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
-import { getTables, createTable, updateTable, deleteTable, resetTable } from '../api'
+import { getTables, createTable, updateTable, deleteTable, resetTable, mergeTables } from '../api'
 import QRCode from 'qrcode'
 
 const tables = ref([])
@@ -72,6 +95,34 @@ const editingTable = ref(null)
 const form = ref({ tableNo: '', seats: 4 })
 const qrDialogVisible = ref(false)
 const qrTableNo = ref('')
+
+// 合并桌台
+const mergeDialogVisible = ref(false)
+const mergeForm = ref({ primaryTableId: null, mergedTableIds: [] })
+
+const openMergeDialog = () => {
+  mergeForm.value = { primaryTableId: null, mergedTableIds: [] }
+  mergeDialogVisible.value = true
+}
+
+const handleMerge = async () => {
+  if (!mergeForm.value.primaryTableId) {
+    ElMessage.warning('请选择主桌台')
+    return
+  }
+  if (mergeForm.value.mergedTableIds.length === 0) {
+    ElMessage.warning('请选择要合并的桌台')
+    return
+  }
+  try {
+    await mergeTables(mergeForm.value)
+    ElMessage.success('桌台合并成功')
+    mergeDialogVisible.value = false
+    loadTables()
+  } catch (e) {
+    ElMessage.error(e.message || '合并失败')
+  }
+}
 const qrDataUrl = ref('')
 const qrUrl = ref('')
 

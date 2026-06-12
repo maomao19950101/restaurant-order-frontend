@@ -128,7 +128,7 @@
       >
         立即支付 ¥{{ order.totalAmount?.toFixed(2) }}
       </van-button>
-      <div v-if="order.status >= 0 && order.status <= 3" class="action-row">
+      <div v-if="order.status >= 0 && order.status <= 2" class="action-row">
         <van-button
           type="warning"
           plain
@@ -141,13 +141,14 @@
           催单{{ order.urgeCount > 0 ? '(' + order.urgeCount + ')' : '' }}
         </van-button>
         <van-button
-          v-if="order.status === 4 && !order.reviewed"
           type="primary"
+          plain
           round
-          @click="goReview"
-          class="review-btn"
+          @click="goAddItems"
+          class="add-btn"
         >
-          去评价
+          <van-icon name="plus" size="16" />
+          加菜
         </van-button>
       </div>
       <van-button
@@ -291,6 +292,11 @@ async function handleUrge() {
     showToast({ message: e.message || '催单失败', type: 'fail' })
   }
   urging.value = false
+}
+
+// 加菜
+function goAddItems() {
+  router.push(`/menu?orderNo=${order.value.orderNo}`)
 }
 
 // 去评价

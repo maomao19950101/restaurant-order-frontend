@@ -47,6 +47,7 @@ export const getOrderDetail = (orderNo) => api.get(`/customer/order/${orderNo}`)
 export const getOrderList = ({ openid, page = 1, size = 10 }) =>
   api.get('/customer/order/list', { params: { openid, page, size } })
 export const urgeOrder = (orderNo) => api.post('/customer/order/urge', { orderNo })
+export const addItemsToOrder = (orderNo, items) => api.post('/customer/order/add-items', { orderNo, items })
 
 // 支付相关
 export const createPayment = (orderNo) => api.post('/customer/payment/create', { orderNo })
