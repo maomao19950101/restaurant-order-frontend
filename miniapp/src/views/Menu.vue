@@ -54,6 +54,40 @@
 
       <!-- Dishes list -->
       <div class="dish-list" ref="dishListRef">
+        <!-- 推荐区域 -->
+        <div v-if="recommendDishes.length > 0 && !searchText.trim()" class="recommend-section">
+          <div class="recommend-header">
+            <div class="recommend-title">
+              <van-icon name="like-o" size="16" color="#f59e0b" />
+              <span>{{ recommendTitle }}</span>
+            </div>
+            <div class="recommend-refresh" @click="refreshRecommend">
+              <van-icon name="replay" size="14" />
+              <span>换一批</span>
+            </div>
+          </div>
+          <div class="recommend-scroll">
+            <div
+              v-for="dish in recommendDishes"
+              :key="'rec-' + dish.id"
+              class="recommend-card"
+              @click="openSpec(dish)"
+            >
+              <div class="recommend-image">
+                <img v-if="dish.image" :src="dish.image" :alt="dish.name" />
+                <div v-else class="dish-placeholder small">{{ dish.name[0] }}</div>
+              </div>
+              <div class="recommend-info">
+                <div class="recommend-name">{{ dish.name }}</div>
+                <div class="recommend-price">
+                  <span class="price">¥{{ dish.currentPrice || dish.price }}</span>
+                  <span v-if="dish.reason" class="recommend-tag">{{ dish.reason }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div
           v-for="(cat, catIndex) in filteredCategories"
           :key="cat.id"
@@ -68,11 +102,13 @@
             v-for="dish in cat.dishes"
             :key="dish.id"
             class="dish-card"
+            :class="{ 'combo-card': dish.isCombo }"
           >
             <div class="dish-image">
               <img v-if="dish.image" :src="dish.image" :alt="dish.name" />
-              <div v-else class="dish-placeholder">{{ dish.name[0] }}</div>
-              <div class="dish-tag" v-if="dish.tag">{{ dish.tag }}</div>
+              <div v-else class="dish-placeholder">{{ dish.isCombo ? '🍱' : dish.name[0] }}</div>
+              <div class="dish-tag" v-if="dish.isCombo">套餐</div>
+              <div class="dish-tag" v-else-if="dish.tag">{{ dish.tag }}</div>
             </div>
             <div class="dish-info">
               <div class="dish-name">{{ dish.name }}</div>
@@ -87,7 +123,18 @@
               </div>
               <div class="dish-bottom">
                 <div class="dish-price">
-                  <span class="price">{{ dish.price }}</span>
+                  <!-- 套餐价格显示 -->
+                  <template v-if="dish.isCombo">
+                    <span class="original-price">¥{{ dish.originalPrice }}</span>
+                    <span class="price">¥{{ dish.price }}</span>
+                    <span class="price-tag combo-tag">省¥{{ dish.saveAmount }}</span>
+                  </template>
+                  <!-- 普通菜品价格显示 -->
+                  <template v-else>
+                    <span v-if="dish.currentPrice && dish.currentPrice !== dish.price" class="original-price">¥{{ dish.price }}</span>
+                    <span class="price">¥{{ dish.currentPrice || dish.price }}</span>
+                    <span v-if="dish.priceLabel" class="price-tag">{{ dish.priceLabel }}</span>
+                  </template>
                 </div>
                 <div class="dish-actions">
                   <template v-if="getDishQuantity(dish) > 0">
@@ -155,12 +202,18 @@
         <div class="spec-dish-info" v-if="currentDish">
           <div class="spec-image">
             <img v-if="currentDish.image" :src="currentDish.image" :alt="currentDish.name" />
-            <div v-else class="dish-placeholder large">{{ currentDish.name[0] }}</div>
+            <div v-else class="dish-placeholder large">{{ currentDish.isCombo ? '🍱' : currentDish.name[0] }}</div>
           </div>
           <div class="spec-detail">
             <div class="spec-name">{{ currentDish.name }}</div>
             <div class="spec-desc" v-if="currentDish.description">{{ currentDish.description }}</div>
-            <div class="spec-price price">{{ currentDish.price }}</div>
+            <div class="spec-price price">¥{{ currentDish.currentPrice || currentDish.price }}</div>
+            <!-- 套餐明细 -->
+            <div v-if="currentDish.isCombo && currentDish.items" class="combo-items">
+              <div v-for="item in currentDish.items" :key="item.id" class="combo-item">
+                {{ item.dishName }} x{{ item.quantity }}
+              </div>
+            </div>
           </div>
         </div>
         <!-- Specs -->
@@ -220,8 +273,9 @@
 
 <script setup>
 import { ref, computed, onMounted, nextTick, onUnmounted } from 'vue'
-import { getMenu } from '../api'
+import { getMenu, getPersonalRecommend, getHotRecommend, getTimeBasedRecommend } from '../api'
 import { useCartStore } from '../stores/cart'
+import { getOpenid } from '../utils/auth'
 import Cart from '../components/Cart.vue'
 
 const cart = useCartStore()
@@ -239,6 +293,11 @@ const selectedSpecs = ref({})
 const activeTab = ref(0)
 const categoryRef = ref(null)
 const dishListRef = ref(null)
+
+// 推荐相关
+const recommendDishes = ref([])
+const recommendTitle = ref('为你推荐')
+const recommendType = ref('personal') // personal, hot, time-based
 
 // Filtered categories based on search
 const filteredCategories = computed(() => {
@@ -258,6 +317,23 @@ const filteredCategories = computed(() => {
 
 // Calculate price including specs
 const calcSpecPrice = computed(() => {
+  if (!currentDish.value) return 0
+  // 套餐直接返回套餐价
+  if (currentDish.value.isCombo) {
+    return (currentDish.value.price * specQty.value).toFixed(2)
+  }
+  let extra = 0
+  if (currentDish.value.specs) {
+    for (const sg of currentDish.value.specs) {
+      const selectedId = selectedSpecs.value[sg.id]
+      if (selectedId) {
+        const opt = sg.options.find((o) => o.id === selectedId)
+        if (opt?.price) extra += opt.price
+      }
+    }
+  }
+  return ((currentDish.value.currentPrice || currentDish.value.price) + extra) * specQty.value).toFixed(2)
+})
   if (!currentDish.value) return 0
   let extra = 0
   if (currentDish.value.specs) {
@@ -328,8 +404,12 @@ function confirmAdd() {
       }
     }
   }
+  // 使用动态定价的当前价格（套餐使用套餐价）
+  const basePrice = currentDish.value.isCombo
+    ? currentDish.value.price
+    : (currentDish.value.currentPrice || currentDish.value.price)
   cart.addItem(
-    { ...currentDish.value, price: currentDish.value.price + extra },
+    { ...currentDish.value, price: basePrice + extra },
     specQty.value,
     specIds,
     specLabels,
@@ -375,14 +455,86 @@ onMounted(async () => {
       restaurantName.value = categories.value[0]?.restaurantName || '扫码点餐'
     }
     setupScrollSpy()
+
+    // 加载推荐菜品
+    loadRecommendations()
   } catch (e) {
     console.error('Failed to load menu:', e)
   }
 })
 
-onUnmounted(() => {
-  if (observer) observer.disconnect()
-})
+// 加载推荐菜品
+async function loadRecommendations() {
+  try {
+    const openid = getOpenid()
+    const limit = 6
+
+    // 优先使用个性化推荐
+    if (openid) {
+      const res = await getPersonalRecommend(cart.restaurantId, openid, limit)
+      if (res.data && res.data.length > 0) {
+        recommendDishes.value = res.data
+        recommendTitle.value = '为你推荐'
+        recommendType.value = 'personal'
+        return
+      }
+    }
+
+    // 降级到时段推荐
+    const res = await getTimeBasedRecommend(cart.restaurantId, limit)
+    if (res.data && res.data.length > 0) {
+      recommendDishes.value = res.data
+      recommendTitle.value = res.data[0]?.reason || '今日推荐'
+      recommendType.value = 'time-based'
+      return
+    }
+
+    // 降级到热门推荐
+    const hotRes = await getHotRecommend(cart.restaurantId, limit)
+    if (hotRes.data && hotRes.data.length > 0) {
+      recommendDishes.value = hotRes.data
+      recommendTitle.value = '热门推荐'
+      recommendType.value = 'hot'
+    }
+  } catch (e) {
+    console.error('Failed to load recommendations:', e)
+  }
+}
+
+// 刷新推荐
+async function refreshRecommend() {
+  try {
+    const limit = 6
+    let res
+
+    if (recommendType.value === 'personal') {
+      res = await getHotRecommend(cart.restaurantId, limit)
+      recommendTitle.value = '热门推荐'
+      recommendType.value = 'hot'
+    } else if (recommendType.value === 'hot') {
+      res = await getTimeBasedRecommend(cart.restaurantId, limit)
+      recommendTitle.value = res.data[0]?.reason || '今日推荐'
+      recommendType.value = 'time-based'
+    } else {
+      const openid = getOpenid()
+      if (openid) {
+        res = await getPersonalRecommend(cart.restaurantId, openid, limit)
+        recommendTitle.value = '为你推荐'
+        recommendType.value = 'personal'
+      } else {
+        res = await getHotRecommend(cart.restaurantId, limit)
+        recommendTitle.value = '热门推荐'
+        recommendType.value = 'hot'
+      }
+    }
+
+    if (res?.data) {
+      recommendDishes.value = res.data
+    }
+  } catch (e) {
+    console.error('Failed to refresh recommendations:', e)
+  }
+}
 </script>
 
 <style scoped>
@@ -636,6 +788,11 @@ onUnmounted(() => {
   transform: scale(0.98);
 }
 
+.dish-card.combo-card {
+  border-color: #f59e0b;
+  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+}
+
 .dish-image {
   width: 92px;
   height: 92px;
@@ -732,6 +889,37 @@ onUnmounted(() => {
 .dish-price .price {
   font-size: 17px;
   font-weight: 700;
+}
+
+.dish-price .original-price {
+  font-size: 12px;
+  color: var(--text3);
+  text-decoration: line-through;
+  margin-right: 4px;
+}
+
+.dish-price .price-tag {
+  font-size: 10px;
+  color: #fff;
+  background: linear-gradient(135deg, #f59e0b, #f97316);
+  padding: 1px 4px;
+  border-radius: 3px;
+  margin-left: 4px;
+  font-weight: 500;
+}
+
+.dish-price .combo-tag {
+  background: linear-gradient(135deg, #10b981, #059669);
+}
+
+.combo-items {
+  margin-top: 8px;
+  font-size: 12px;
+  color: var(--text2);
+}
+
+.combo-item {
+  padding: 2px 0;
 }
 
 .dish-actions {
@@ -1006,6 +1194,131 @@ onUnmounted(() => {
 .menu-tabbar {
   border-top: 1px solid var(--border);
   box-shadow: 0 -1px 8px rgba(0, 0, 0, 0.02);
+}
+
+/* Recommend section */
+.recommend-section {
+  padding: 12px 0;
+  margin-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.recommend-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 4px 10px;
+}
+
+.recommend-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.recommend-refresh {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--text3);
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 12px;
+  transition: all 0.2s;
+}
+
+.recommend-refresh:active {
+  background: var(--bg);
+  color: var(--text2);
+}
+
+.recommend-scroll {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.recommend-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.recommend-card {
+  flex-shrink: 0;
+  width: 110px;
+  background: var(--surface);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.recommend-card:active {
+  transform: scale(0.96);
+}
+
+.recommend-image {
+  width: 100%;
+  height: 80px;
+  overflow: hidden;
+}
+
+.recommend-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.dish-placeholder.small {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  background: var(--surface2);
+  color: var(--text2);
+}
+
+.recommend-info {
+  padding: 8px;
+}
+
+.recommend-name {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-bottom: 4px;
+}
+
+.recommend-price {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.recommend-price .price {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.recommend-tag {
+  font-size: 10px;
+  color: #fff;
+  background: linear-gradient(135deg, #f59e0b, #f97316);
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-weight: 500;
 }
 
 </style>

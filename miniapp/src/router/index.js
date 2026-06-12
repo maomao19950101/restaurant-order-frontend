@@ -31,6 +31,26 @@ const routes = [
     name: 'TableSelect',
     component: () => import('../views/TableSelect.vue'),
   },
+  {
+    path: '/review/:orderNo',
+    name: 'ReviewSubmit',
+    component: () => import('../views/ReviewSubmit.vue'),
+  },
+  {
+    path: '/member',
+    name: 'MemberCenter',
+    component: () => import('../views/MemberCenter.vue'),
+  },
+  {
+    path: '/coupons',
+    name: 'Coupons',
+    component: () => import('../views/Coupons.vue'),
+  },
+  {
+    path: '/points',
+    name: 'Points',
+    component: () => import('../views/Points.vue'),
+  },
 ]
 
 const router = createRouter({

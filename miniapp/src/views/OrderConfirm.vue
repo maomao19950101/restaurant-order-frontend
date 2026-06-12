@@ -82,6 +82,16 @@
         {{ cart.isShared ? '全员确认下单' : '确认下单' }}
       </van-button>
     </div>
+
+    <!-- 支付弹窗 -->
+    <PayDialog
+      ref="payDialogRef"
+      :orderNo="currentOrderNo"
+      :amount="cart.totalPrice"
+      paymentMode="mock"
+      @success="onPaySuccess"
+      @cancel="onPayCancel"
+    />
   </div>
 </template>
 
@@ -92,11 +102,14 @@ import { useCartStore } from '../stores/cart'
 import { createOrder, createSharedOrder } from '../api'
 import { getOpenid } from '../utils/auth'
 import { showToast, showDialog } from 'vant'
+import PayDialog from '../components/PayDialog.vue'
 
 const cart = useCartStore()
 const router = useRouter()
 const submitting = ref(false)
 const remark = ref(cart.remark || '')
+const payDialogRef = ref(null)
+const currentOrderNo = ref('')
 
 async function submitOrder() {
   if (cart.items.length === 0) {
@@ -145,18 +158,43 @@ async function submitOrder() {
       res = await createOrder(orderData)
     }
     const orderNo = res.data?.orderNo
-    cart.clearCart()
-    showToast('下单成功')
-    if (orderNo) {
-      router.replace(`/order/${orderNo}`)
+    const needPayment = res.data?.needPayment
+
+    if (orderNo && needPayment) {
+      // 需要支付，打开支付弹窗
+      currentOrderNo.value = orderNo
+      cart.clearCart()
+      // 延迟打开弹窗，确保组件已渲染
+      setTimeout(() => {
+        payDialogRef.value?.open()
+      }, 100)
     } else {
-      router.replace('/orders')
+      // 不需要支付（兼容旧流程）
+      cart.clearCart()
+      showToast('下单成功')
+      if (orderNo) {
+        router.replace(`/order/${orderNo}`)
+      } else {
+        router.replace('/orders')
+      }
     }
   } catch (e) {
     showToast('下单失败: ' + (e.message || '未知错误'))
   } finally {
     submitting.value = false
   }
+}
+
+// 支付成功回调
+function onPaySuccess(data) {
+  showToast({ message: '支付成功', type: 'success' })
+  router.replace(`/order/${currentOrderNo.value}`)
+}
+
+// 取消支付回调
+function onPayCancel() {
+  // 跳转到订单详情页，用户可以稍后支付
+  router.replace(`/order/${currentOrderNo.value}`)
 }
 </script>
 

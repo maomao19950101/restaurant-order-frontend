@@ -13,8 +13,10 @@
     "@stomp/stompjs": "^7.3.0",
     "@vue/shared": "^3.5.35",
     "axios": "^1.7.0",
+    "echarts": "^6.1.0",
     "element-plus": "^2.7.0",
     "pinia": "^2.1.0",
+    "qrcode": "^1.5.4",
     "vue": "^3.4.0",
     "vue-router": "^4.3.0"
   },

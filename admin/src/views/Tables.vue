@@ -18,8 +18,9 @@
           <el-tag :type="tableStatusType(table.status)" size="small" style="margin-top: 8px">
             {{ tableStatusText(table.status) }}
           </el-tag>
-          <div style="margin-top: 10px">
+          <div style="margin-top: 10px; display: flex; justify-content: center; gap: 6px; flex-wrap: wrap">
             <el-button v-if="table.status !== 0" text size="small" type="primary" @click.stop="handleReset(table)">重置</el-button>
+            <el-button text size="small" type="success" @click.stop="showQR(table)">二维码</el-button>
             <el-popconfirm title="确定删除？" @confirm="handleDelete(table)">
               <template #reference>
                 <el-button text size="small" type="danger" @click.stop>删除</el-button>
@@ -44,6 +45,18 @@
         <el-button type="primary" @click="saveTable">保存</el-button>
       </template>
     </el-dialog>
+
+    <!-- QR Code Dialog -->
+    <el-dialog v-model="qrDialogVisible" :title="'桌台 ' + qrTableNo + ' 二维码'" width="360">
+      <div style="text-align: center">
+        <img v-if="qrDataUrl" :src="qrDataUrl" style="width: 260px; height: 260px" />
+        <p style="margin-top: 12px; color: #909399; font-size: 12px; word-break: break-all">{{ qrUrl }}</p>
+      </div>
+      <template #footer>
+        <el-button @click="downloadQR">下载</el-button>
+        <el-button type="primary" @click="printQR">打印</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -51,11 +64,16 @@
 import { ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { getTables, createTable, updateTable, deleteTable, resetTable } from '../api'
+import QRCode from 'qrcode'
 
 const tables = ref([])
 const dialogVisible = ref(false)
 const editingTable = ref(null)
 const form = ref({ tableNo: '', seats: 4 })
+const qrDialogVisible = ref(false)
+const qrTableNo = ref('')
+const qrDataUrl = ref('')
+const qrUrl = ref('')
 
 const tableStatusText = (s) => ['空闲','用餐中','待清理'][s] || '未知'
 const tableStatusType = (s) => ['success','warning','info'][s] || 'info'
@@ -96,6 +114,51 @@ const handleReset = async (table) => {
 
 const handleDelete = async (table) => {
   try { await deleteTable(table.id); ElMessage.success('删除成功'); loadTables() } catch (e) { ElMessage.error(e.message) }
+}
+
+
+const showQR = async (table) => {
+  qrTableNo.value = table.tableNo
+  const origin = window.location.origin
+  // 使用正确的顾客端路径
+  qrUrl.value = origin + '/customer/?restaurantId=1&tableId=' + table.id
+  try {
+    // 优先使用后端接口生成二维码
+    const token = localStorage.getItem('admin_token')
+    const response = await fetch(`/api/admin/table/${table.id}/qrcode/base64`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+    const result = await response.json()
+    if (result.code === 200 && result.data?.base64) {
+      qrDataUrl.value = result.data.base64
+    } else {
+      // 降级到前端生成
+      qrDataUrl.value = await QRCode.toDataURL(qrUrl.value, { width: 260, margin: 2 })
+    }
+    qrDialogVisible.value = true
+  } catch (e) {
+    // 降级到前端生成
+    try {
+      qrDataUrl.value = await QRCode.toDataURL(qrUrl.value, { width: 260, margin: 2 })
+      qrDialogVisible.value = true
+    } catch (err) {
+      ElMessage.error('生成二维码失败')
+    }
+  }
+}
+
+const downloadQR = () => {
+  const a = document.createElement('a')
+  a.href = qrDataUrl.value
+  a.download = 'table-' + qrTableNo.value + '-qr.png'
+  a.click()
+}
+
+const printQR = () => {
+  const w = window.open('', '_blank')
+  w.document.write('<html><body style="text-align:center"><img src="' + qrDataUrl.value + '" style="width:300px" /><p>' + qrUrl.value + '</p></body></html>')
+  w.document.close()
+  w.print()
 }
 
 onMounted(loadTables)

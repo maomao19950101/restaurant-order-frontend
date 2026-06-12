@@ -65,9 +65,34 @@
             </div>
           </div>
         </div>
+        <!-- 凑单提示 -->
+        <div v-if="cartTips.minOrderTip && cartTips.amountToMinOrder > 0" class="cart-tip min-order-tip">
+          <van-icon name="info-o" size="14" />
+          <span>{{ cartTips.minOrderTip }}</span>
+        </div>
+        <div v-if="cartTips.reductionTip" class="cart-tip reduction-tip">
+          <van-icon name="gift-o" size="14" />
+          <span>{{ cartTips.reductionTip }}</span>
+        </div>
+        <div v-if="cartTips.currentDiscountTip" class="cart-tip discount-tip">
+          <van-icon name="coupon-o" size="14" />
+          <span>{{ cartTips.currentDiscountTip }}</span>
+        </div>
+
         <!-- Remark -->
         <div class="cart-remark" v-if="cart.items.length > 0">
           <input v-model="cart.remark" placeholder="订单备注（选填）" />
+          <!-- 常用备注 -->
+          <div class="remark-tags" v-if="commonRemarks.length > 0">
+            <div
+              v-for="remark in commonRemarks.slice(0, 8)"
+              :key="remark.id"
+              class="remark-tag"
+              @click="selectRemark(remark.content)"
+            >
+              {{ remark.content }}
+            </div>
+          </div>
         </div>
         <!-- Clear cart -->
         <div class="cart-clear" v-if="cart.items.length > 0">
@@ -95,11 +120,51 @@
 </template>
 
 <script setup>
+import { ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useCartStore } from '../stores/cart'
+import { getCartTips, getCommonRemarks } from '../api'
 
 const cart = useCartStore()
 const router = useRouter()
+
+// 凑单提示
+const cartTips = ref({})
+const commonRemarks = ref([])
+const showRemarks = ref(false)
+
+// 加载凑单提示
+const loadCartTips = async () => {
+  if (cart.totalPrice <= 0) {
+    cartTips.value = {}
+    return
+  }
+  try {
+    const res = await getCartTips(cart.restaurantId, cart.totalPrice)
+    if (res.code === 200) {
+      cartTips.value = res.data || {}
+    }
+  } catch (e) {
+    console.error('加载凑单提示失败:', e)
+  }
+}
+
+// 加载常用备注
+const loadCommonRemarks = async () => {
+  try {
+    const res = await getCommonRemarks(cart.restaurantId)
+    if (res.code === 200) {
+      commonRemarks.value = res.data || []
+    }
+  } catch (e) {
+    console.error('加载常用备注失败:', e)
+  }
+}
+
+// 监听购物车金额变化
+watch(() => cart.totalPrice, () => {
+  loadCartTips()
+})
 
 function increase(idx) {
   cart.items[idx].quantity++
@@ -122,6 +187,19 @@ function goCheckout() {
   cart.showCart = false
   router.push('/order/confirm')
 }
+
+// 选择常用备注
+function selectRemark(remark) {
+  if (cart.remark) {
+    cart.remark += '，' + remark
+  } else {
+    cart.remark = remark
+  }
+}
+
+// 初始化加载
+loadCommonRemarks()
+loadCartTips()
 </script>
 
 <style scoped>
@@ -370,6 +448,59 @@ function goCheckout() {
 .cart-remark input:focus {
   border-color: var(--primary);
   background: #fff;
+}
+
+.remark-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.remark-tag {
+  padding: 4px 10px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  font-size: 12px;
+  color: var(--text2);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.remark-tag:active {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+
+/* 凑单提示 */
+.cart-tip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.min-order-tip {
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fde68a;
+}
+
+.reduction-tip {
+  background: #dbeafe;
+  color: #1e40af;
+  border: 1px solid #93c5fd;
+}
+
+.discount-tip {
+  background: #d1fae5;
+  color: #065f46;
+  border: 1px solid #6ee7b7;
 }
 
 .cart-clear {

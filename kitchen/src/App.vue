@@ -20,11 +20,34 @@
         </button>
       </nav>
       <div class="header-right">
+        <!-- 音效开关 -->
+        <button class="icon-btn" @click="toggleSound" :title="soundEnabled ? '关闭音效' : '开启音效'">
+          <svg v-if="soundEnabled" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+          </svg>
+          <svg v-else viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/>
+          </svg>
+        </button>
+        <!-- 语音播报开关 -->
+        <button class="icon-btn" :class="{ active: voiceEnabled }" @click="toggleVoice" :title="voiceEnabled ? '关闭语音' : '开启语音'">
+          <svg v-if="voiceEnabled" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/>
+          </svg>
+          <svg v-else viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+            <line x1="1" y1="1" x2="23" y2="23"/>
+          </svg>
+        </button>
+        <!-- WebSocket 连接状态 -->
+        <div class="ws-status" :class="{ online: connected }" :title="connected ? '实时连接' : '离线'">
+          <span class="ws-dot"></span>
+          <span class="ws-text">{{ connected ? '实时' : '离线' }}</span>
+        </div>
         <div class="live-clock">
           <span class="clock-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></span>
           <span class="clock-text">{{ currentTime }}</span>
         </div>
-        <div class="online-dot"></div>
       </div>
     </header>
 
@@ -117,16 +140,27 @@
         </div>
         <div class="col-body">
           <TransitionGroup name="card">
-            <div v-for="order in doneOrders" :key="order.id" class="order-card done">
+            <div v-for="order in doneOrders" :key="order.id" class="order-card done" :class="{ 'called': order.called }">
               <div class="card-top">
                 <div class="table-tag done-tag">{{ order.tableNo || '桌' + order.tableId }}</div>
-                <div class="time-tag">{{ formatTime(order.createdAt) }}</div>
+                <div class="time-tag">
+                  <span v-if="order.called" class="called-badge">已叫号</span>
+                  {{ formatTime(order.createdAt) }}
+                </div>
               </div>
               <div class="card-items">
                 <div v-for="item in order.items" :key="item.id" class="card-item">
                   <span class="item-name">{{ item.dishName }}</span>
                   <span class="item-qty">×{{ item.quantity }}</span>
                 </div>
+              </div>
+              <button v-if="!order.called" class="btn btn-warning" @click="callOrder(order)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                叫号通知
+              </button>
+              <div v-else class="called-text">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                已通知取餐
               </div>
             </div>
           </TransitionGroup>
@@ -205,6 +239,9 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { useWebSocket } from './composables/useWebSocket'
+import { useSound } from './composables/useSound'
+import { useVoice } from './composables/useVoice'
 
 const restaurantId = 1
 const restaurantName = ref('示例餐厅')
@@ -213,6 +250,31 @@ const currentTime = ref('')
 const pendingOrders = ref([])
 const cookingOrders = ref([])
 const doneOrders = ref([])
+
+// WebSocket、音效和语音
+const { connected, connect: connectWS, disconnect: disconnectWS } = useWebSocket(restaurantId, handleWSMessage)
+const { soundEnabled, playNotification, toggleSound } = useSound()
+const { voiceEnabled, speakNewOrder, speakUrgeOrder, toggleVoice } = useVoice()
+
+// WebSocket 消息处理
+function handleWSMessage(data) {
+  console.log('[WS] 收到消息:', data)
+  // 收到新订单通知时刷新订单列表
+  if (data.type === 'NEW_ORDER' || data.type === 'ORDER_UPDATE') {
+    loadOrders()
+    playNotification()
+    // 语音播报新订单
+    if (data.type === 'NEW_ORDER' && data.order) {
+      speakNewOrder(data.order)
+    }
+  }
+  // 催单通知
+  if (data.type === 'URGE_ORDER') {
+    loadOrders()
+    playNotification()
+    speakUrgeOrder(data)
+  }
+}
 
 const selectedPeriod = ref('today')
 const statsData = ref({})
@@ -277,6 +339,17 @@ const completeOrder = async (order) => {
   } catch (e) { console.error('更新失败:', e) }
 }
 
+const callOrder = async (order) => {
+  try {
+    const res = await fetch(`/api/kitchen/order/${order.orderNo}/call`, { method: 'PUT' })
+    const data = await res.json()
+    if (data.code === 200) {
+      order.called = 1
+      playSound()
+    }
+  } catch (e) { console.error('叫号失败:', e) }
+}
+
 const isUrgent = (order) => {
   return Date.now() - new Date(order.createdAt).getTime() > 15 * 60 * 1000
 }
@@ -292,16 +365,9 @@ const updateTime = () => {
   currentTime.value = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`
 }
 
+// 使用 useSound 模块替代简单的 playSound
 const playSound = () => {
-  try {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)()
-    const osc = ctx.createOscillator()
-    const gain = ctx.createGain()
-    osc.connect(gain); gain.connect(ctx.destination)
-    osc.frequency.value = 800; gain.gain.value = 0.3
-    osc.start()
-    setTimeout(() => { osc.stop(); ctx.close() }, 200)
-  } catch (e) {}
+  playNotification()
 }
 
 let timeTimer, pollTimer
@@ -309,9 +375,22 @@ onMounted(() => {
   updateTime()
   timeTimer = setInterval(updateTime, 1000)
   loadOrders()
-  pollTimer = setInterval(loadOrders, 30000)
+
+  // 连接 WebSocket
+  connectWS()
+
+  // 降级轮询：WebSocket 未连接时使用轮询
+  pollTimer = setInterval(() => {
+    if (!connected.value) {
+      loadOrders()
+    }
+  }, 30000)
 })
-onUnmounted(() => { clearInterval(timeTimer); clearInterval(pollTimer) })
+onUnmounted(() => {
+  clearInterval(timeTimer)
+  clearInterval(pollTimer)
+  disconnectWS()
+})
 </script>
 
 <style>
@@ -470,6 +549,78 @@ onUnmounted(() => { clearInterval(timeTimer); clearInterval(pollTimer) })
   letter-spacing: .5px;
 }
 
+/* Icon button */
+.icon-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text2);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all .2s;
+}
+
+.icon-btn:hover {
+  background: var(--surface2);
+  color: var(--text);
+  border-color: var(--border-strong);
+}
+
+.icon-btn.active {
+  background: rgba(99,102,241,.1);
+  color: var(--brand);
+  border-color: var(--brand);
+}
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all .2s;
+}
+.icon-btn:hover {
+  background: var(--surface2);
+  color: var(--text);
+  border-color: var(--border-strong);
+}
+
+/* WebSocket status */
+.ws-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  background: rgba(239,68,68,.1);
+  border: 1px solid rgba(239,68,68,.2);
+}
+.ws-status.online {
+  background: rgba(16,185,129,.1);
+  border-color: rgba(16,185,129,.2);
+}
+.ws-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--danger);
+}
+.ws-status.online .ws-dot {
+  background: var(--success);
+  box-shadow: 0 0 8px rgba(16,185,129,.5);
+  animation: pulse-dot 2s infinite;
+}
+.ws-text {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text2);
+}
+.ws-status.online .ws-text {
+  color: var(--success);
+}
+
 .online-dot {
   width: 8px;
   height: 8px;
@@ -612,6 +763,31 @@ onUnmounted(() => { clearInterval(timeTimer); clearInterval(pollTimer) })
 .order-card.done {
   border-left: 3px solid var(--success);
   opacity: .55;
+}
+
+.order-card.done.called {
+  opacity: .75;
+  border-left-color: var(--warning);
+}
+
+.called-badge {
+  background: rgba(245,158,11,.15);
+  color: var(--warning);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  margin-right: 4px;
+}
+
+.called-text {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--success);
+  font-weight: 500;
+  padding: 8px 0;
 }
 
 .order-card.urgent {

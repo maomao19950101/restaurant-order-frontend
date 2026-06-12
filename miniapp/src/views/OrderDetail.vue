@@ -16,6 +16,17 @@
       </div>
     </div>
 
+    <!-- 支付状态提示条 -->
+    <div v-if="order && order.status === -1" class="payment-bar">
+      <div class="payment-info">
+        <van-icon name="warning-o" size="16" />
+        <span>订单待支付，请在15分钟内完成支付</span>
+      </div>
+      <van-button type="primary" size="small" round @click="openPayDialog">
+        去支付
+      </van-button>
+    </div>
+
     <div class="detail-content" v-if="order">
       <!-- Status timeline -->
       <div class="timeline-card">
@@ -97,6 +108,70 @@
       </div>
     </div>
 
+    <!-- 催单/叫号提示 -->
+    <div v-if="order && order.called === 1" class="call-bar">
+      <div class="call-info">
+        <van-icon name="volume-o" size="20" color="#f59e0b" />
+        <span>您的餐品已出餐，请尽快取餐！</span>
+      </div>
+    </div>
+
+    <!-- 底部操作栏 -->
+    <div v-if="order" class="bottom-bar safe-bottom">
+      <van-button
+        v-if="order.status === -1"
+        type="primary"
+        block
+        round
+        @click="openPayDialog"
+        class="pay-btn"
+      >
+        立即支付 ¥{{ order.totalAmount?.toFixed(2) }}
+      </van-button>
+      <div v-if="order.status >= 0 && order.status <= 3" class="action-row">
+        <van-button
+          type="warning"
+          plain
+          round
+          @click="handleUrge"
+          :loading="urging"
+          class="urge-btn"
+        >
+          <van-icon name="clock-o" size="16" />
+          催单{{ order.urgeCount > 0 ? '(' + order.urgeCount + ')' : '' }}
+        </van-button>
+        <van-button
+          v-if="order.status === 4 && !order.reviewed"
+          type="primary"
+          round
+          @click="goReview"
+          class="review-btn"
+        >
+          去评价
+        </van-button>
+      </div>
+      <van-button
+        v-if="order.status === 4 && !order.reviewed"
+        type="primary"
+        block
+        round
+        @click="goReview"
+        class="review-btn"
+      >
+        去评价
+      </van-button>
+    </div>
+
+    <!-- 支付弹窗 -->
+    <PayDialog
+      ref="payDialogRef"
+      :orderNo="order?.orderNo"
+      :amount="order?.totalAmount"
+      paymentMode="mock"
+      @success="onPaySuccess"
+      @cancel="onPayCancel"
+    />
+
     <!-- Loading -->
     <div v-else class="loading-wrap">
       <van-loading type="spinner" color="#ff6b35" vertical>加载中...</van-loading>
@@ -106,29 +181,39 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { useRoute } from 'vue-router'
-import { getOrderDetail } from '../api'
+import { useRoute, useRouter } from 'vue-router'
+import { getOrderDetail, urgeOrder } from '../api'
+import { showToast } from 'vant'
+import PayDialog from '../components/PayDialog.vue'
 
 const route = useRoute()
+const router = useRouter()
 const order = ref(null)
+const payDialogRef = ref(null)
+const urging = ref(false)
 let ws = null
 
-const statusTexts = ['待接单', '已接单', '制作中', '已出餐', '已完成', '已取消']
-const statusIcons = ['pending', 'accepted', 'cooking', 'ready', 'done', 'cancelled']
-const statusDescs = ['请耐心等待商家接单', '商家已确认您的订单', '厨师正在精心制作中', '菜品已准备好，请取餐', '感谢您的光临', '订单已取消']
+const statusTexts = ['待支付', '待接单', '已接单', '制作中', '已出餐', '已完成', '已取消']
+const statusIcons = ['unpaid', 'pending', 'accepted', 'cooking', 'ready', 'done', 'cancelled']
+const statusDescs = ['请在15分钟内完成支付', '请耐心等待商家接单', '商家已确认您的订单', '厨师正在精心制作中', '菜品已准备好，请取餐', '感谢您的光临', '订单已取消']
 
 const statusStep = computed(() => {
   if (!order.value) return 0
   const s = order.value.status
+  if (s === -1) return 0  // 待支付
   return s >= 5 ? 0 : s
 })
 
 const statusText = computed(() => {
   if (!order.value) return ''
-  return statusTexts[order.value.status] || '未知'
+  const s = order.value.status
+  // 待支付状态
+  if (s === -1) return statusTexts[0]
+  return statusTexts[s + 1] || '未知'
 })
 
 const statusIconSvgs = {
+  unpaid: '<svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>',
   pending: '<svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>',
   accepted: '<svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',
   cooking: '<svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M6 13.87A4 4 0 0 1 7.41 6a5.11 5.11 0 0 1 1.05-1.54 5 5 0 0 1 7.08 0A5.11 5.11 0 0 1 16.59 6 4 4 0 0 1 18 13.87V21H6z"/><line x1="6" y1="17" x2="18" y2="17"/></svg>',
@@ -138,8 +223,10 @@ const statusIconSvgs = {
 }
 
 const statusIcon = computed(() => {
-  if (!order.value) return 'pending'
-  return statusIcons[order.value.status] || 'pending'
+  if (!order.value) return 'unpaid'
+  const s = order.value.status
+  if (s === -1) return 'unpaid'
+  return statusIcons[s + 1] || 'pending'
 })
 
 const statusSvg = computed(() => {
@@ -148,7 +235,9 @@ const statusSvg = computed(() => {
 
 const statusDesc = computed(() => {
   if (!order.value) return ''
-  return statusDescs[order.value.status] || ''
+  const s = order.value.status
+  if (s === -1) return statusDescs[0]
+  return statusDescs[s + 1] || ''
 })
 
 const timelineSteps = computed(() => {
@@ -166,6 +255,47 @@ function formatTime(t) {
   if (!t) return ''
   const d = new Date(t)
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`
+}
+
+// 打开支付弹窗
+function openPayDialog() {
+  payDialogRef.value?.open()
+}
+
+// 支付成功回调
+function onPaySuccess(data) {
+  // 刷新订单状态
+  if (order.value) {
+    order.value.status = 0  // 更新为待接单
+    order.value.paid = 1
+  }
+}
+
+// 取消支付回调
+function onPayCancel() {
+  // 用户取消支付，可以稍后再付
+}
+
+// 催单
+async function handleUrge() {
+  if (!order.value?.orderNo) return
+  urging.value = true
+  try {
+    const res = await urgeOrder(order.value.orderNo)
+    if (res.code === 200) {
+      order.value.urgeCount = res.data.urgeCount
+      order.value.lastUrgeTime = res.data.lastUrgeTime
+      showToast({ message: '催单成功，厨房已收到通知', type: 'success' })
+    }
+  } catch (e) {
+    showToast({ message: e.message || '催单失败', type: 'fail' })
+  }
+  urging.value = false
+}
+
+// 去评价
+function goReview() {
+  router.push(`/review/${order.value.orderNo}`)
 }
 
 function connectWebSocket() {
@@ -192,6 +322,12 @@ function connectWebSocket() {
           const payload = JSON.parse(data.substring(jsonStart, jsonEnd + 1))
           if (payload.status !== undefined && order.value) {
             order.value.status = payload.status
+          }
+          // 处理叫号通知
+          if (payload.type === 'CALL_ORDER' && order.value) {
+            order.value.called = 1
+            order.value.calledAt = new Date().toISOString()
+            showToast({ message: '您的餐品已出餐，请尽快取餐！', duration: 5000 })
           }
         } catch (e) { /* ignore */ }
       }
@@ -528,5 +664,84 @@ onUnmounted(() => {
   justify-content: center;
   align-items: center;
   min-height: 60vh;
+}
+
+/* Payment bar */
+.payment-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: #fff7ed;
+  border-bottom: 1px solid #fed7aa;
+}
+
+.payment-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #ea580c;
+}
+
+/* Bottom bar */
+.bottom-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 12px 16px;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  box-shadow: 0 -2px 16px rgba(0, 0, 0, 0.05);
+}
+
+.pay-btn {
+  height: 46px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+/* Call bar */
+.call-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 16px;
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  border-bottom: 1px solid #f59e0b;
+  animation: pulse-bg 2s ease-in-out infinite;
+}
+
+@keyframes pulse-bg {
+  0%, 100% { background: linear-gradient(135deg, #fef3c7, #fde68a); }
+  50% { background: linear-gradient(135deg, #fde68a, #fcd34d); }
+}
+
+.call-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #92400e;
+}
+
+/* Action row */
+.action-row {
+  display: flex;
+  gap: 12px;
+}
+
+.urge-btn {
+  flex: 1;
+  height: 44px;
+  font-size: 15px;
+}
+
+.review-btn {
+  flex: 1;
+  height: 44px;
+  font-size: 15px;
 }
 </style>

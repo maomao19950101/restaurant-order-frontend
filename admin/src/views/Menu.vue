@@ -79,9 +79,31 @@
             <el-option v-for="c in categories" :key="c.id" :label="c.name" :value="c.id" />
           </el-select>
         </el-form-item>
-        <el-form-item label="价格" required>
+        <el-form-item label="基础价格" required>
           <el-input-number v-model="dishForm.price" :min="0" :precision="2" />
         </el-form-item>
+        <el-divider>动态定价（可选）</el-divider>
+        <el-form-item label="高峰价">
+          <el-input-number v-model="dishForm.peakPrice" :min="0" :precision="2" placeholder="高峰时段价格" />
+          <span style="margin-left: 10px; color: var(--text2); font-size: 12px">为空则使用基础价格</span>
+        </el-form-item>
+        <el-form-item label="闲时价">
+          <el-input-number v-model="dishForm.offPeakPrice" :min="0" :precision="2" placeholder="闲时价格" />
+          <span style="margin-left: 10px; color: var(--text2); font-size: 12px">为空则使用基础价格</span>
+        </el-form-item>
+        <el-form-item label="高峰时段">
+          <div v-for="(period, i) in peakHours" :key="i" style="display: flex; gap: 8px; margin-bottom: 8px; align-items: center">
+            <el-time-picker v-model="period.start" format="HH:mm" value-format="HH:mm" placeholder="开始时间" style="width: 120px" />
+            <span>至</span>
+            <el-time-picker v-model="period.end" format="HH:mm" value-format="HH:mm" placeholder="结束时间" style="width: 120px" />
+            <el-button text type="danger" @click="peakHours.splice(i, 1)">删除</el-button>
+          </div>
+          <el-button text type="primary" @click="peakHours.push({ start: '', end: '' })">+ 添加时段</el-button>
+        </el-form-item>
+        <el-form-item label="成本价">
+          <el-input-number v-model="dishForm.costPrice" :min="0" :precision="2" placeholder="用于毛利分析" />
+        </el-form-item>
+        <el-divider></el-divider>
         <el-form-item label="菜品图片">
           <el-upload
             class="dish-uploader"
@@ -154,9 +176,10 @@ const selectedCat = ref(null)
 const dishDialogVisible = ref(false)
 const categoryDialogVisible = ref(false)
 const editingDish = ref(null)
-const dishForm = ref({ name: '', categoryId: null, price: 0, description: '', imageUrl: '', stock: -1, sortOrder: 0, specs: [] })
+const peakHours = ref([])
+const dishForm = ref({ name: '', categoryId: null, price: 0, description: '', imageUrl: '', stock: -1, sortOrder: 0, specs: [], peakPrice: null, offPeakPrice: null, peakHours: '', costPrice: null })
 
-const uploadUrl = computed(() => '/api/admin/dish/upload')
+const uploadUrl = computed(() => '/api/admin/upload')
 const uploadHeaders = computed(() => {
   const token = localStorage.getItem('admin_token')
   return token ? { Authorization: `Bearer ${token}` } : {}
@@ -171,9 +194,14 @@ const beforeUpload = (file) => {
 }
 
 const handleUploadSuccess = (response) => {
-  const url = response.data?.url || response.data?.imageUrl || response.data || response.url
-  if (url) { dishForm.value.imageUrl = url; ElMessage.success('图片上传成功') }
-  else { ElMessage.error('上传成功但未获取到图片地址') }
+  // 新接口返回格式: { code: 200, data: { url: "...", filename: "..." } }
+  const url = response.data?.url || response.url
+  if (url) {
+    dishForm.value.imageUrl = url
+    ElMessage.success('图片上传成功')
+  } else {
+    ElMessage.error('上传成功但未获取到图片地址')
+  }
 }
 
 const loadCategories = async () => {
@@ -190,9 +218,16 @@ const openDishDialog = (dish) => {
   if (dish) {
     editingDish.value = dish
     dishForm.value = { ...dish, specs: dish.specs ? [...dish.specs] : [], imageUrl: dish.imageUrl || '' }
+    // 解析高峰时段
+    try {
+      peakHours.value = dish.peakHours ? JSON.parse(dish.peakHours) : []
+    } catch {
+      peakHours.value = []
+    }
   } else {
     editingDish.value = null
-    dishForm.value = { name: '', categoryId: selectedCat.value, price: 0, description: '', imageUrl: '', stock: -1, sortOrder: 0, specs: [] }
+    dishForm.value = { name: '', categoryId: selectedCat.value, price: 0, description: '', imageUrl: '', stock: -1, sortOrder: 0, specs: [], peakPrice: null, offPeakPrice: null, peakHours: '', costPrice: null }
+    peakHours.value = []
   }
   dishDialogVisible.value = true
 }
@@ -203,6 +238,10 @@ const saveDish = async () => {
   }
   saving.value = true
   try {
+    // 处理高峰时段
+    const validPeakHours = peakHours.value.filter(p => p.start && p.end)
+    dishForm.value.peakHours = validPeakHours.length > 0 ? JSON.stringify(validPeakHours) : ''
+
     if (editingDish.value) {
       await updateDish(editingDish.value.id, dishForm.value); ElMessage.success('编辑成功')
     } else {
